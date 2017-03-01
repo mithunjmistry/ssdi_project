@@ -21,5 +21,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', login_page, name="login"),
     url(r'^signup/', signup_page, name="signup"),
+    url(r'^testdb/', test_database, name="testdb"),
 ]
 

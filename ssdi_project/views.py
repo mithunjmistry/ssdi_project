@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from mongoengine.django.auth import *
 from django.contrib.auth import authenticate
+from ssdi_project.models import *
 
 def signup_page(request):
     if request.POST:
@@ -15,7 +16,7 @@ def signup_page(request):
             user.save()
         else:
             return HttpResponse("You didn't confirmed your password correctly.")
-    return render(request, "signup.html")
+    return render(request, "index.html")
 
 
 def login_page(request):
@@ -27,4 +28,9 @@ def login_page(request):
             return HttpResponse("Welcome " + uname)
         else:
             return HttpResponse("Try again. Please check your username and password again!")
-    return render(request, "login.html")
+    return render(request, "index.html")
+
+def test_database(request):
+    test = Test.objects.create(id=0, First_Name="Mithun", Last_Name="Mistry", Age=18)
+    test.save()
+    return render(request, "index.html")
