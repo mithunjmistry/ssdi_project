@@ -14,9 +14,10 @@ def signup_page(request):
         if upass == upass_confirm:
             user = User.create_user(username=uname.strip(), email=uemail.strip(), password=upass)
             user.save()
+            return HttpResponse("User Created successfully")
         else:
             return HttpResponse("You didn't confirmed your password correctly.")
-    return render(request, "index.html")
+    return render(request, "signup.html")
 
 
 def login_page(request):
@@ -28,7 +29,7 @@ def login_page(request):
             return HttpResponse("Welcome " + uname)
         else:
             return HttpResponse("Try again. Please check your username and password again!")
-    return render(request, "index.html")
+    return render(request, "login.html")
 
 def test_database(request):
     test = Test.objects.create(id=0, First_Name="Mithun", Last_Name="Mistry", Age=18)
