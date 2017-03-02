@@ -29,7 +29,7 @@ def login_page(request):
             return HttpResponse("Welcome " + uname)
         else:
             return HttpResponse("Try again. Please check your username and password again!")
-    return render(request, "login.html")
+    return render(request, "index.html")
 
 def test_database(request):
     test = Test.objects.create(id=0, First_Name="Mithun", Last_Name="Mistry", Age=18)
