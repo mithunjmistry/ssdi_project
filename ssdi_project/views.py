@@ -32,6 +32,14 @@ def login_page(request):
     return render(request, "index.html")
 
 def test_database(request):
-    test = Test.objects.create(id=0, First_Name="Mithun", Last_Name="Mistry", Age=18)
-    test.save()
+    '''
+    t = Doctor.objects.create(id=0, first_name="Mithun", last_name="Mistry", email="mithunjmistry@gmail.com",
+                              speciality="heart",
+                              status="permanent", consulting_fees=50,
+                              office_hours=([Timings(day="Monday", time="9 to 5")]))
+    t.save()
+    '''
+    t = Doctor.objects(first_name="Mithun").first()
+    t.office_hours.append(Timings(day="Tuesday", time="8 to 5"))
+    t.save()
     return render(request, "index.html")
