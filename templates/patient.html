@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Welcome {{ user }} {% endblock %}
+{% block title %}Welcome {{ user.get_username }} {% endblock %}
+
+{% block loggedusername %} {{ user.get_username }} {% endblock %}
 
 {% block side_options %}
 <li><a style="background-color:#a7adba;" href="#tab_b" data-toggle="pill">View my Appointments</a></li>

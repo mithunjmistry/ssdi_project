@@ -1,10 +1,10 @@
 import mongoengine
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from mongoengine.django.auth import *
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from ssdi_project.models import *
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.cache import never_cache
 
 def get_boolean(value):
@@ -18,7 +18,6 @@ def get_boolean(value):
 def FactoryUserStatus(loggeduser):
     t = TypeOfUser.objects(username=loggeduser).first()
     t.user_status
-    print t.user_status
     return str(t.user_status)
 
 def signup_page(request):
@@ -38,7 +37,7 @@ def signup_page(request):
         state = str(request.POST.get("state"))
         if upass == upass_confirm:
             try:
-                user = User.create_user(username=username, email=uemail, password=upass)
+                user = User.objects.create_user(username=username, email=uemail, password=upass)
                 user.save()
                 insured = get_boolean(insurance)
                 td = Patient.objects.create(username=username, email=uemail, first_name=first_name, last_name=last_name, gender=gender, dob=dob,
@@ -54,6 +53,8 @@ def signup_page(request):
     return render(request, "register.html", {'error': None})
 
 def login_page(request):
+    if request.user.get_username():
+        return redirect(login_successful, FactoryUserStatus(request.user.get_username()), request.user.get_username())
     if request.POST:
         username = request.POST.get("username")
         upass = request.POST.get("password")
@@ -61,7 +62,7 @@ def login_page(request):
         if user is not None:
             login(request, user)
             UserType = FactoryUserStatus(username)
-            return redirect(login_successful, loggeduserstatus=UserType, loggedusername=username)
+            return redirect(login_successful, UserType, username)
         else:
             return render(request, "login.html", {'error': "Email or password incorrect!"})
     return render(request, "login.html", {'error': None})
@@ -69,12 +70,25 @@ def login_page(request):
 @login_required
 @never_cache
 def login_successful(request, loggeduserstatus, loggedusername):
-    return render(request, "{}.html".format(loggeduserstatus), {"message": "How you doing today: {}".format(loggedusername), "user": loggedusername})
+    return render(request, "{}.html".format(loggeduserstatus), {"message": "How you doing today: {}".format(loggedusername)})
 
-@login_required
 def logout_user(request):
     logout(request)
-    redirect(login_page)
+    return redirect(login_page)
+
+@login_required
+@never_cache
+def delete_user(request, username):
+    try:
+        u = User.objects.get(username = username)
+        u.delete()
+        logout(request)
+        return render(request, "user_deleted.html")
+    except:
+        return HttpResponse("Oops! Something went wrong!")
+
+
+
 
 def test_database(request):
     '''

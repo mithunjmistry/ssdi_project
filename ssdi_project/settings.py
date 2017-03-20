@@ -49,6 +49,8 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+
 ]
 
 ROOT_URLCONF = 'ssdi_project.urls'
@@ -78,7 +80,8 @@ WSGI_APPLICATION = 'ssdi_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.dummy',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'mydatabase'),
     }
 }
 
@@ -119,16 +122,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
-SESSION_ENGINE = 'mongoengine.django.sessions'
+#SESSION_ENGINE = 'mongoengine.django.sessions'
 
 mongoengine.connect("test-database")
 
 from ssdi_project.views import login_page
 LOGIN_URL = login_page
 
+'''
 AUTHENTICATION_BACKENDS = (
     'mongoengine.django.auth.MongoEngineBackend',
 )
+'''
 
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 

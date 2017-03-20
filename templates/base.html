@@ -328,11 +328,10 @@ section{
                 </label>
                 <input type="checkbox" name="" id="open">
                 <nav>
-                    <a href="/">Home</a>
-                    <a href="/about">About us</a>
+                    <a href="#">{% block loggedusername %}Home {% endblock %}</a>
                     <a href="/changepassword">Change Password</a>
+                    <a href="/deleteuser/{{ user.get_username }}">Delete User</a>
                     <a href="/logout">Logout</a>
-                    
                 </nav>
             </div>
         </div>
