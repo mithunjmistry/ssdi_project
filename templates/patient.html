@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome {{ user }} {% endblock %}
+
+{% block side_options %}
+<li><a style="background-color:#a7adba;" href="#tab_b" data-toggle="pill">View my Appointments</a></li>
+<li><a style="background-color:#a7adba;" href="#tab_c" data-toggle="pill">My Prescriptions</a></li>
+<li><a style="background-color:#a7adba;" href="#tab_d" data-toggle="pill">Previous Bills</a></li>
+{% endblock %}
+
+{% block message %}{{ message }} {% endblock %}
+
+{% block side_options_messages %}
+<div class="tab-pane" id="tab_b">
+             <h4>View my Appointments</h4>
+            <p>Here we will show his appointments.</p>
+        </div>
+        <div class="tab-pane" id="tab_c">
+             <h4>My Prescriptions</h4>
+            <p>Here we will show his prescriptions.</p>
+        </div>
+        <div class="tab-pane" id="tab_d">
+             <h4>Previous Bills</h4>
+            <p>Here we will show his previous bills.</p>
+        </div>
+{% endblock %}

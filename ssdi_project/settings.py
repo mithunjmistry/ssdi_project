@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-MIDDLEWARE = [
+MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -78,8 +78,8 @@ WSGI_APPLICATION = 'ssdi_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': '',
-    },
+        'ENGINE': 'django.db.backends.dummy',
+    }
 }
 
 
@@ -115,14 +115,16 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
 SESSION_ENGINE = 'mongoengine.django.sessions'
 
-mongoengine.connect("ssdi-database")
+mongoengine.connect("test-database")
+
+from ssdi_project.views import login_page
+LOGIN_URL = login_page
 
 AUTHENTICATION_BACKENDS = (
     'mongoengine.django.auth.MongoEngineBackend',

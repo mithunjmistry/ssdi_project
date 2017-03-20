@@ -1,10 +1,25 @@
-from mongoengine.django.storage import *
+from mongoengine import *
+
+class Patient(Document):
+    username = StringField(required=True, primary_key=True)
+    email = EmailField(required=True)
+    first_name = StringField(required=True)
+    last_name = StringField(required=True)
+    gender = StringField(required=True)
+    dob = StringField(required=True)
+    insured = BooleanField(required=True)
+    phone_number = StringField(required=True)
+    address = StringField(required=True)
+    zipcode = StringField(required=True)
+    state = StringField(required=True)
+
+class TypeOfUser(Document):
+    username = StringField(required=True)
+    user_status = StringField(required=True)
 
 class Test(Document):
     id = IntField(primary_key=True)
-    First_Name = StringField(max_length=15, required=True)
-    Last_Name = StringField(max_length=15, required=True)
-    Age = IntField(min_value=0, max_value=150, required=True)
+    email = EmailField()
 
 class Timings(EmbeddedDocument):
     day = StringField()
