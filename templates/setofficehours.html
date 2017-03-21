@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome {{ user.get_username }} {% endblock %}
+
+{% block loggedusername %} {{ user.get_username }} {% endblock %}
+
+{% block side_options %}
+    <li><a style="background-color:#a7adba;" href="/success/doctor/{{ user.get_username }}" data-toggle="pill">View my Appointments</a></li>
+<li><a style="background-color:#a7adba;" href="#tab_b" data-toggle="pill">View my Appointments</a></li>
+ <li class="active"><a  style="background-color:#a7adba;" href="#tab_a" data-toggle="pill">Set Office Hours</a></li>
+<li><a style="background-color:#a7adba;" href="#tab_d" data-toggle="pill">Set consultation fees</a></li>
+{% endblock %}
+
+{% block message %}
+    <div class="container pull-right">
+                {% if error %}
+		        <div class="alert alert-danger">
+                    <strong>Error!</strong> {{ error }}.
+                </div>
+                {% endif %}
+
+				<h2> Update Office Hours:</h2>
+				<form name="officehours" id="officehours" method="post">
+                    {% csrf_token %}
+
+				<div class="row">
+				<div class="form-group col col-md-6 col-md-offset-1">
+				<label for="submit"></label>
+				<input type="submit"  class="btn btn-success" name="submit"  id="submit"  value="Register">
+				</div>
+				</div>
+			</form>
+</div>
+{% endblock %}
+
+{% block side_options_messages %}
+<div class="tab-pane" id="tab_b">
+             <h4>View my Appointments</h4>
+            <p>Here we will show his appointments.</p>
+        </div>
+        <div class="tab-pane" id="tab_c">
+             <h4>Set Office hours</h4>
+            <p>Here we will show his prescriptions.</p>
+        </div>
+        <div class="tab-pane" id="tab_d">
+             <h4>Set Consultation fees</h4>
+            <p>Here we will show his previous bills.</p>
+        </div>
+{% endblock %}

@@ -340,8 +340,9 @@ section{
 
 <div class="container">
 <ul class="nav nav-pills nav-stacked col-md-2">
-  <li class="active"><a  style="background-color:#a7adba;" href="#tab_a" data-toggle="pill">My Home</a></li>
     {% block side_options %}
+  <li class="active"><a  style="background-color:#a7adba;" href="#tab_a" data-toggle="pill">My Home</a></li>
+
   <li><a style="background-color:#a7adba;" href="#tab_b" data-toggle="pill">View an Appointments</a></li>
   <li><a style="background-color:#a7adba;" href="#tab_c" data-toggle="pill">Patient's Prescrition</a></li>
   <li><a style="background-color:#a7adba;" href="#tab_d" data-toggle="pill">Account Info</a></li>
@@ -349,8 +350,7 @@ section{
 </ul>
 <div class="tab-content col-md-10">
         <div class="tab-pane active" id="tab_a">
-             <h4>Welcome</h4>
-            <p>{% block message %} {% endblock %}</p>
+            {% block message %} {% endblock %}
         </div>
             {% block side_options_messages %}
         <div class="tab-pane" id="tab_b">

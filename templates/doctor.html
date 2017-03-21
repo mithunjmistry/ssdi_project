@@ -7,8 +7,8 @@
 {% block side_options %}
     <li class="active"><a  style="background-color:#a7adba;" href="#tab_a" data-toggle="pill">My Home</a></li>
 <li><a style="background-color:#a7adba;" href="#tab_b" data-toggle="pill">View my Appointments</a></li>
-<li><a style="background-color:#a7adba;" href="#tab_c" data-toggle="pill">My Prescriptions</a></li>
-<li><a style="background-color:#a7adba;" href="#tab_d" data-toggle="pill">Previous Bills</a></li>
+<li><a style="background-color:#a7adba;" href="/timings/{{ user.get_username }}" data-toggle="pill">Set Office hours</a></li>
+<li><a style="background-color:#a7adba;" href="#tab_d" data-toggle="pill">Set consultation fees</a></li>
 {% endblock %}
 
 {% block message %}<p> {{ message }} </p> {% endblock %}
@@ -19,11 +19,11 @@
             <p>Here we will show his appointments.</p>
         </div>
         <div class="tab-pane" id="tab_c">
-             <h4>My Prescriptions</h4>
+             <h4>Set Office hours</h4>
             <p>Here we will show his prescriptions.</p>
         </div>
         <div class="tab-pane" id="tab_d">
-             <h4>Previous Bills</h4>
+             <h4>Set Consultation fees</h4>
             <p>Here we will show his previous bills.</p>
         </div>
 {% endblock %}

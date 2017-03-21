@@ -4,8 +4,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from ssdi_project.models import *
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
+import random
+from django.core.mail import send_mail
 
 def get_boolean(value):
     if value.lower() == "yes":
@@ -87,7 +89,52 @@ def delete_user(request, username):
     except:
         return HttpResponse("Oops! Something went wrong!")
 
+@login_required
+@never_cache
+def set_office_hours(request, username):
+    if FactoryUserStatus(username) == "doctor":
+        return "Hi"
+    else:
+        return redirect(login_page)
 
+@login_required
+@never_cache
+def doctor_add(request, username):
+    if FactoryUserStatus(username) == "receptionist":
+        if request.POST:
+            uemail = str(request.POST.get("email")).strip()
+            uemail_confirm = str(request.POST.get("email_confirm")).strip()
+            username = str(request.POST.get("username")).strip()
+            upass = random.randint(11111111, 999999999)
+            first_name = str(request.POST.get("fname")).strip()
+            last_name = str(request.POST.get("lname")).strip()
+            gender = str(request.POST.get("gender")).strip()
+            dob = str(request.POST.get("dob")).strip()
+            phone = str(request.POST.get("mobileno")).strip()
+            address = str(request.POST.get("address")).strip()
+            zipcode = str(request.POST.get("zipcode")).strip()
+            state = str(request.POST.get("state"))
+            speciality = str(request.POST.get("speciality"))
+            status = str(request.POST.get("status"))
+            if uemail == uemail_confirm:
+                try:
+                    user = User.objects.create_user(username=username, email=uemail, password=upass)
+                    user.save()
+                    td = Doctor.objects.create(username=username, email=uemail, first_name=first_name, last_name=last_name, gender=gender, dob=dob,
+                                                phone_number=phone, address=address, zipcode=zipcode, state=state, speciality=speciality, status=status)
+                    td.save()
+                    tr = TypeOfUser.objects.create(username=username, user_status="doctor")
+                    tr.save()
+                    message = "Hello Doctor,\nYou are registered in our group of hospitals successfully. Your username is {} and password is {}. Please change your password after logging in.\nHave a great day.".format(username, upass)
+                    send_mail(subject=("Registration Status"),message=str(message),from_email="ssdigroupproject@gmail.com", recipient_list=[uemail])
+                    return render(request, "user_created.html")
+                except:
+                    return render(request, "doctoradd.html", {'error': "This username is already being taken!"})
+            else:
+                return render(request, "doctoradd.html", {'error': "You didn't confirmed email address properly!"})
+        return render(request, "doctoradd.html", {"error": None})
+    else:
+        return redirect(login_page)
 
 
 def test_database(request):
@@ -109,7 +156,10 @@ def test_database(request):
     td = Patient.objects.create(email="mithunjmistry@gmail.com", first_name="Mithun", last_name="Mistry", gender="Male", dob="04-12-1995",
                                             insured=True, phone_number="9033914035", address="abhilasha", zipcode="396195", state="Gujarat")
     td.save()
-    '''
+
     tr = TypeOfUser.objects.create(username="mithun", user_status="patient")
     tr.save()
+
     return HttpResponse("This database is nice.")
+    '''
+    return render(request, "doctoradd.html")
