@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 import random
 from django.core.mail import send_mail
+from django.views.generic import View
 
 def get_boolean(value):
     if value.lower() == "yes":
@@ -77,6 +78,19 @@ def login_successful(request, loggeduserstatus, loggedusername):
 def logout_user(request):
     logout(request)
     return redirect(login_page)
+
+@never_cache
+@login_required
+def check_beds(request, username):
+    if FactoryUserStatus(username) == "receptionist":
+        t = Receptionist.objects(username=username).only('state').first()
+        b = Beds.objects(location=t.state).exclude('location')
+        d = {}
+        for i in b:
+            d[i.room_type] = i.availability
+        return render(request, "checkbeds.html", {"d": d})
+    else:
+        return redirect(login_page)
 
 @login_required
 @never_cache
@@ -161,5 +175,23 @@ def test_database(request):
     tr.save()
 
     return HttpResponse("This database is nice.")
+
+
+    tr = Beds.objects.create(room_type="General", location="NC", availability=10)
+    tr.save()
+    tr1 = Beds.objects.create(room_type="ICU", location="NC", availability=5)
+    tr1.save()
+    tr2 = Beds.objects.create(room_type="Emergency", location="NC", availability=2)
+    tr2.save()
+    tr3 = Beds.objects.create(room_type="AC Deluxe", location="NC", availability=4)
+    tr3.save()
+
+    user = User.objects.create_user(username="rachel", email="mithunjmistry@gmail.com", password="1234567890")
+    user.save()
+    td = Receptionist.objects.create(username="rachel", email="mithunjmistry@gmail.com", first_name="Rachel", last_name="Green", gender="Female", dob="04-12-1995",
+                                                phone_number="5086152876", address="434 Barton Creek Dr", zipcode="28262", state="NC")
+    td.save()
     '''
-    return render(request, "doctoradd.html")
+    tr = TypeOfUser.objects.create(username="rachel", user_status="receptionist")
+    tr.save()
+    return HttpResponse("This is nice.")

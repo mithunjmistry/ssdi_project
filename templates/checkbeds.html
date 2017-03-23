@@ -5,14 +5,32 @@
 {% block loggedusername %} {{ user.get_username }} {% endblock %}
 
 {% block side_options %}
-    <li class="active"><a style="background-color:#a7adba;" href="#tab_a" data-toggle="pill">My Home</a></li>
-<li><a style="background-color:#a7adba;" href="/beds/{{ user.get_username }}">View available beds</a></li>
+    <li><a style="background-color:#a7adba;" href="/success/receptionist/{{ user.get_username }}">My Home</a></li>
+    <li class="active"><a style="background-color:#a7adba;" href="#tab_a" data-toggle="pill">View available beds</a></li>
 <li><a style="background-color:#a7adba;" href="#tab_c" data-toggle="pill">Admit Patient</a></li>
 <li><a style="background-color:#a7adba;" href="#tab_d" data-toggle="pill">Discharge Patient</a></li>
-    <li><a style="background-color:#a7adba;" href="/doctoradd/{{ user.get_username }}" data-toggle="pill">Add Doctor</a></li>
+    <li><a style="background-color:#a7adba;" href="/doctoradd/{{ user.get_username }}">Add Doctor</a></li>
 {% endblock %}
 
-{% block message %} <p>Welcome {{ user.get_username }}</p>{% endblock %}
+{% block message %} <table class="table">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Room Type</th>
+      <th>Available beds</th>
+    </tr>
+  </thead>
+<tbody>
+{% for key,value in d.items %}
+    <tr>
+      <th scope="row">{{ forloop.counter }}</th>
+      <td>{{ key }}</td>
+      <td>{{ value }}</td>
+    </tr>
+{% endfor %}
+    </tbody>
+</table>
+{% endblock %}
 
 {% block side_options_messages %}
 <div class="tab-pane" id="tab_b">

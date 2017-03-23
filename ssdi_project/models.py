@@ -57,6 +57,11 @@ class Doctor(Stakeholders):
 class Receptionist(Stakeholders):
     salary = FloatField(default=3500.0)
 
+class Beds(Document):
+    room_type = StringField(required=True)
+    location = StringField(required=True, default="NC")
+    availability = IntField(default=0)
+
 class Test(Document):
     id = IntField(primary_key=True)
     email = EmailField()
