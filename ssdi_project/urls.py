@@ -32,5 +32,6 @@ urlpatterns = [
     url(r'^doctoradd/(\w+)/', doctor_add, name="doctoradd"),
     url(r'^about/', TemplateView.as_view(template_name="about.html")),
     url(r'^testdb/', test_database, name="testdb"),
+    url(r'^backenddb/', backend_adder, name="BackEndAdder"),
 ]
 

@@ -230,3 +230,25 @@ def test_database(request):
     return render(request, "ShowDoctors.html", {"full_name": full_name, "speciality": speciality, "state": state, "content": content})
     '''
     return HttpResponse("This is nice!")
+
+def backend_adder(request):
+    first_name = ["Cersei", "Daenerys", "Penny"]
+    last_name = ["Lannister", "Targaryen", "Hofstader"]
+    username = ["clannister", "dragon", "penny"]
+    gender = "Female"
+    state = "NC"
+    speciality = "Neurologist"
+    content = zip(first_name, last_name, username)
+    for first_name,last_name,username in content:
+        user = User.objects.create_user(username=username, email="mithunjmistry@gmail.com", password="1234567890")
+        user.save()
+        td = Doctor.objects.create(username=username, email="mithunjmistry@gmail.com", first_name=first_name,
+                                   last_name=last_name, gender=gender, dob="04-12-1995",
+                                   phone_number="5086152876", address="434 Barton Creek Dr", zipcode="28262", state=state,
+                                   speciality=speciality, status="permanent", consulting_fees=150.0,
+                                   office_hours=[Timings(day="Monday", time="9 to 5")])
+        td.save()
+
+        tr = TypeOfUser.objects.create(username=username, user_status="doctor")
+        tr.save()
+    return HttpResponse("Added by backend.")

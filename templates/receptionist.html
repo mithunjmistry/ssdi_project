@@ -9,7 +9,7 @@
 <li><a style="background-color:#a7adba;" href="/beds/{{ user.get_username }}">View available beds</a></li>
 <li><a style="background-color:#a7adba;" href="#tab_c" data-toggle="pill">Admit Patient</a></li>
 <li><a style="background-color:#a7adba;" href="#tab_d" data-toggle="pill">Discharge Patient</a></li>
-    <li><a style="background-color:#a7adba;" href="/doctoradd/{{ user.get_username }}" data-toggle="pill">Add Doctor</a></li>
+    <li><a style="background-color:#a7adba;" href="/doctoradd/{{ user.get_username }}">Add Doctor</a></li>
 {% endblock %}
 
 {% block message %} <p>Welcome {{ user.get_username }}</p>{% endblock %}
