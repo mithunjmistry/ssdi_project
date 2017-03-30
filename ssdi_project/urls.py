@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^register/', signup_page, name="signup"),
     url(r'^login/', login_page, name="login"),
     url(r'^logout/', logout_user, name="logout"),
+    url(r'^doctors/', show_doctors, name="ShowDoctors"),
     url(r'^success/(\w+)/(\w+)', login_successful, name="success"),
     url(r'^timings/(\w+)/', set_office_hours, name="OfficeHours"),
     url(r'^beds/(\w+)/', check_beds, name="CheckBeds"),

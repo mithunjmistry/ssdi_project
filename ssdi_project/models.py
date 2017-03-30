@@ -50,7 +50,7 @@ class DoctorAppointments(Appointments):
 class Doctor(Stakeholders):
     speciality = StringField(required=True, max_length=25)
     status = StringField(required=True)
-    consulting_fees = FloatField()
+    consulting_fees = FloatField(default=50.0)
     office_hours = ListField(EmbeddedDocumentField(Timings))
     doctor_appointments = ListField(EmbeddedDocumentField(DoctorAppointments))
 

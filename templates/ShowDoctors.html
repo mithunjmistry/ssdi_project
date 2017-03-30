@@ -1,27 +1,13 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-   <title>Registration Page</title>
-   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-<script type="text/javascript" src="validator/src/js/bootstrapValidator.js"></script>
-
-
-  
-
-	<!-- Optional theme -->
-	
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-</head>
-
-<style>
-
-.container form input[type="submit"]{
-		 
-		width:100%;
-}
-
-*{
+    <meta charset="UTF-8">
+    <title>Doctors</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+        *{
   margin: 0;
     padding: 0;
     outline: none;
@@ -203,9 +189,9 @@ section{
     .section-tagline{
         font-size: 1.3em;
     }
-    
+
 }
- 
+
 /*  portrait tablet */
 @media (max-width: 767px) {
     .container{
@@ -240,9 +226,9 @@ section{
     .section-tagline{
         font-size: 1.3em;
     }
-   
+
 }
- 
+
 /* Landscape phones and down */
 @media (max-width: 480px) {
     body{
@@ -256,7 +242,7 @@ section{
         overflow: hidden;
         -webkit-transition: all .3s ease;
     }
-    
+
     nav>a{
         padding: 0 1em;
         display: block;
@@ -289,7 +275,7 @@ section{
     .section-tagline{
         font-size: 1em;
     }
-   
+
     .hidden-desktop{
         display: block;
     }
@@ -299,11 +285,81 @@ section{
 
 
 
+    .navbar {
+      margin-bottom: 0;
+      border-radius: 0;
+    }
 
-</style>
+    /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+    .row.content {height: 550px}
 
-<header class="clearfix">
-    <div class="container">
+    /* Set gray background color and 100% height */
+    .sidenav {
+      padding-top: 20px;
+      background-color: #f1f1f1;
+      height: 100%;
+    }
+
+    /* Set black background color, white text and some padding */
+    footer {
+      background-color: #555;
+      color: white;
+      padding: 15px;
+    }
+    .col-sm-2 sidenav{
+      font-color:black;
+
+}
+        body{
+  padding:20px 20px;
+}
+
+.results tr[visible='false'],
+.no-result{
+  display:none;
+}
+
+.results tr[visible='true']{
+  display:table-row;
+}
+
+.counter{
+  padding:8px;
+  color:#ccc;
+}
+    </style>
+    <script type="application/javascript">
+        $(document).ready(function() {
+  $(".search").keyup(function () {
+    var searchTerm = $(".search").val();
+    var listItem = $('.results tbody').children('tr');
+    var searchSplit = searchTerm.replace(/ /g, "'):containsi('")
+
+  $.extend($.expr[':'], {'containsi': function(elem, i, match, array){
+        return (elem.textContent || elem.innerText || '').toLowerCase().indexOf((match[3] || "").toLowerCase()) >= 0;
+    }
+  });
+
+  $(".results tbody tr").not(":containsi('" + searchSplit + "')").each(function(e){
+    $(this).attr('visible','false');
+  });
+
+  $(".results tbody tr:containsi('" + searchSplit + "')").each(function(e){
+    $(this).attr('visible','true');
+  });
+
+  var jobCount = $('.results tbody tr[visible="true"]').length;
+    $('.counter').text(jobCount + ' item');
+
+  if(jobCount == '0') {$('.no-result').show();}
+    else {$('.no-result').hide();}
+		  });
+});
+    </script>
+</head>
+<body>
+<nav class="navbar navbar-inverse">
+  <div class="container">
             <div class="header-left">
                 <h1>Hospital Management System</h1>
             </div>
@@ -317,58 +373,38 @@ section{
                     <a href="/doctors">Doctors</a>
                     <a href="/about">About us</a>
                     <a href="/register">Register</a>
-                    <a href="#">Login</a>
-                    
+                    <a href="/login">Login</a>
                 </nav>
             </div>
         </div>
-    </header>
+</nav>
 
-<body>
-
-
-
-
-<div class="container pull-right">
-		
-		
-				<h2 > Login</h2>
-                {% if error %}
-		        <div class="alert alert-danger">
-                    <strong>Error!</strong> {{ error }}.
-                </div>
-                {% endif %}
-				<form name="login" id="login" method="post">
-                    {% csrf_token %}
-				
-				<div class="row vertical-center-row"   >
-				<div class="form-group col col-md-4 col-centered col-md-offset-1">
-				<label for="username">Username</label>
-				<input type="text" name="username" class="form-control"  id="username" required>
-				</div>
-				</div>
-
-				<div class="row ">
-				<div class="form-group col col-md-4 col-md-offset-1">
-				<label for="password" >Password</label>
-                    <input type="password" name="password" class="form-control" id="password" required>
-				</div>
-				</div>
-
-					
-
-				<div class="row">
-				<div class="form-group col col-md-4 col-md-offset-1">
-				<label for="submit"></label>
-				<input type="submit"  class="btn btn-success" name="login"  id="login"  value="Login">
-				</div>
-				</div>
-  
-
-				
-			</form>
-    </div>
-			
-
+<div class="form-group pull-right">
+    <input type="text" class="search form-control" placeholder="What you looking for?">
+</div>
+<span class="counter pull-right"></span>
+<table class="table table-hover table-bordered results">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th class="col-md-5 col-xs-5">Name</th>
+      <th class="col-md-4 col-xs-4">Speciality</th>
+      <th class="col-md-3 col-xs-3">City</th>
+    </tr>
+    <tr class="warning no-result">
+      <td colspan="4"><i class="fa fa-warning"></i> No result</td>
+    </tr>
+  </thead>
+  <tbody>
+  {% for full_name,speciality,state in content %}
+    <tr>
+      <th scope="row">{{ forloop.counter }}</th>
+      <td>{{ full_name }}</td>
+      <td>{{ speciality }}</td>
+      <td>{{ state }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
 </body>
 </html>

@@ -20,7 +20,6 @@ def get_boolean(value):
 
 def FactoryUserStatus(loggeduser):
     t = TypeOfUser.objects(username=loggeduser).first()
-    t.user_status
     return str(t.user_status)
 
 def signup_page(request):
@@ -79,8 +78,8 @@ def logout_user(request):
     logout(request)
     return redirect(login_page)
 
-@never_cache
 @login_required
+@never_cache
 def check_beds(request, username):
     if FactoryUserStatus(username) == "receptionist":
         t = Receptionist.objects(username=username).only('state').first()
@@ -150,6 +149,19 @@ def doctor_add(request, username):
     else:
         return redirect(login_page)
 
+def show_doctors(request):
+    full_name = []
+    speciality = []
+    state = []
+
+    for doctor in Doctor.objects:
+        full_name.append(str(doctor.first_name + " " + doctor.last_name))
+        speciality.append(str(doctor.speciality))
+        state.append(str(doctor.state))
+
+    content = zip(full_name, speciality, state)
+    return render(request, "ShowDoctors.html",
+                  {"full_name": full_name, "speciality": speciality, "state": state, "content": content})
 
 def test_database(request):
     '''
@@ -191,7 +203,30 @@ def test_database(request):
     td = Receptionist.objects.create(username="rachel", email="mithunjmistry@gmail.com", first_name="Rachel", last_name="Green", gender="Female", dob="04-12-1995",
                                                 phone_number="5086152876", address="434 Barton Creek Dr", zipcode="28262", state="NC")
     td.save()
-    '''
+
     tr = TypeOfUser.objects.create(username="rachel", user_status="receptionist")
     tr.save()
-    return HttpResponse("This is nice.")
+
+    user = User.objects.create_user(username="pheebs", email="mithunjmistry@gmail.com", password="1234567890")
+    user.save()
+    td = Doctor.objects.create(username="pheebs", email="mithunjmistry@gmail.com", first_name="Phoebe", last_name="Buffay", gender="Female", dob="04-12-1995",
+                                                phone_number="5086152876", address="434 Barton Creek Dr", zipcode="28262", state="NC", speciality="cardiac", status="permanent", consulting_fees=50.0,
+                               office_hours=[Timings(day="Monday", time="9 to 5")])
+    td.save()
+
+    tr = TypeOfUser.objects.create(username="pheebs", user_status="doctor")
+    tr.save()
+    
+    full_name = []
+    speciality = []
+    state = []
+
+    for doctor in Doctor.objects:
+        full_name.append(str(doctor.first_name + " " + doctor.last_name))
+        speciality.append(str(doctor.speciality))
+        state.append(str(doctor.state))
+
+    content = zip(full_name,speciality,state)
+    return render(request, "ShowDoctors.html", {"full_name": full_name, "speciality": speciality, "state": state, "content": content})
+    '''
+    return HttpResponse("This is nice!")
