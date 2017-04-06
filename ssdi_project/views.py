@@ -8,6 +8,15 @@ from django.views.decorators.cache import never_cache
 import random
 from django.core.mail import send_mail
 
+def Admit_Patient():
+    patient_name = 'Shalaka'
+    if (Patient.objects(username=patient_name)):
+        Beds.objects(room_type='AC Deluxe',location='NC',room_number=1,bed_number=2,patient_name=patient_name)
+        Patient.objects(username=patient_name).update(set__currently_admitted=True)
+        return HttpResponse('Patient admitted successfully')
+    else:
+        return HttpResponse('Patient non existent')
+
 def get_boolean(value):
     if value.lower() == "yes":
         return True
@@ -163,6 +172,24 @@ def show_doctors(request):
 
 def test_database(request):
     '''
+    user = User.objects.create_user(username="Shalaka", email="shalaka@gmail.com", password="1234567890")
+    user.save()
+
+
+    tr = TypeOfUser.objects.create(username="Shalaka", user_status="patient")
+    tr.save()
+
+    td = Patient.objects.create(username='Shalaka',email="shalaka@gmail.com", first_name="Shalaka", last_name="Thombare", gender="Female",
+                                dob="20-10-1991",
+                                insured=True, phone_number="9803202869", address="abhilasha", zipcode="28262",
+                                state="NC")
+    td.save()
+
+    tr = TypeOfUser.objects.create(username="mithun", user_status="patient")
+    tr.save()
+
+    user = User.objects.create_user(username="rachel", email="mithunjmistry@gmail.com", password="1234567890")
+    user.save()
     t = Doctor.objects.create(id=1, first_name="Shalaka", last_name="Thombre", email="shalaka@gmail.com",
                               speciality="heart",
                               status="permanent", consulting_fees=50,
@@ -227,8 +254,22 @@ def test_database(request):
     content = zip(full_name,speciality,state)
     return render(request, "ShowDoctors.html", {"full_name": full_name, "speciality": speciality, "state": state, "content": content})
     '''
-    return HttpResponse("This is nice!")
+    return HttpResponse('This is nice')
 
 
 def backend_adder(request):
+
+    patient_name = 'Shalaka'
+    if (Patient.objects(username=patient_name)):
+        Beds.objects(room_type='AC Deluxe').update_one(push__patient_name='Shalaka', location='NC',
+                     room_number=3, bed_number=3)
+        #Patient.objects(username=patient_name).update(set__currently_admitted=True)
+        return HttpResponse('Patient admitted successfully')
+    else:
+        return HttpResponse('Patient non existent')
     return HttpResponse("Added by backend.")
+    '''
+    b = Beds.objects()
+    for bed in b:
+        print bed.patient_name
+        '''

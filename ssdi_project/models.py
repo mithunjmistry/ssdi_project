@@ -1,5 +1,7 @@
 from mongoengine import *
 
+
+
 class Stakeholders(Document):
     meta = {'allow_inheritance': True}
     username = StringField(required=True, primary_key=True)
@@ -60,7 +62,9 @@ class Receptionist(Stakeholders):
 class Beds(Document):
     room_type = StringField(required=True)
     location = StringField(required=True, default="NC")
-    availability = IntField(default=0)
+    room_number = IntField(required=True)
+    bed_number = IntField(required=True)
+    patient_name = StringField(default=None)
 
 class Test(Document):
     id = IntField(primary_key=True)
