@@ -8,14 +8,21 @@ from django.views.decorators.cache import never_cache
 import random
 from django.core.mail import send_mail
 
-def Admit_Patient():
+def Admit_Patient(request):
+    '''
     patient_name = 'Shalaka'
     if (Patient.objects(username=patient_name)):
-        Beds.objects(room_type='AC Deluxe',location='NC',room_number=1,bed_number=2,patient_name=patient_name)
-        Patient.objects(username=patient_name).update(set__currently_admitted=True)
-        return HttpResponse('Patient admitted successfully')
+        if request.POST['patientId']:
+            #Beds.objects(room_type='AC Deluxe',location='NC',room_number=1,bed_number=2,patient_name=patient_name)
+            #Patient.objects(username=patient_name).update(set__currently_admitted=True)
+            return HttpResponse('Patient admitted successfully')
     else:
         return HttpResponse('Patient non existent')
+        '''
+    print 'Hey there'
+    if request.POST['patientId'].tostring() == 'Shalaka':
+        print request.POST.get('patientId').tostring()
+        return HttpResponse('Success')
 
 def get_boolean(value):
     if value.lower() == "yes":
@@ -258,18 +265,17 @@ def test_database(request):
 
 
 def backend_adder(request):
-
+    '''
     patient_name = 'Shalaka'
     if (Patient.objects(username=patient_name)):
-        Beds.objects(room_type='AC Deluxe').update_one(push__patient_name='Shalaka', location='NC',
-                     room_number=3, bed_number=3)
+        Beds.objects.create(room_type='AC Deluxe',patient_name=None, location='NC',
+                     room_number=4, bed_number=3)
         #Patient.objects(username=patient_name).update(set__currently_admitted=True)
         return HttpResponse('Patient admitted successfully')
     else:
         return HttpResponse('Patient non existent')
     return HttpResponse("Added by backend.")
     '''
-    b = Beds.objects()
+    b = Beds.objects(patient_name=None)
     for bed in b:
-        print bed.patient_name
-        '''
+        print bed.room_number

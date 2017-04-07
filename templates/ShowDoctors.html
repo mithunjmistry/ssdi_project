@@ -9,87 +9,6 @@
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
 
 
-<script type='text/javascript'>
- 
-$(function () {
-    // Selectors for future use
-    var myTable = "#table";
-    var myTableBody = myTable + " tbody";
-    var myTableRows = myTableBody + " tr";
-    var myTableColumn = myTable + " th";
- 
-    // Starting table state
-    function initTable() {
-        $(myTableBody).attr("data-pageSize", 100 );
-        $(myTableBody).attr("data-firstRecord", 0);
-        $('#previous').hide();
-        $('#next').show();
- 
-        // Start the pagination
-        paginate(parseInt($(myTableBody).attr("data-firstRecord"), 10),
-                 parseInt($(myTableBody).attr("data-pageSize"), 10));
-    }
- 
-    // Heading click
-    $(myTableColumn).click(function () {
- 
-        // Start the pagination
-        paginate(parseInt($(myTableBody).attr("data-firstRecord"), 10),
-                 parseInt($(myTableBody).attr("data-pageSize"), 10));
-    });
- 
-    // Pager click
-    $("a.paginate").click(function (e) {
-        e.preventDefault();
-        var tableRows = $(myTableRows);
-        var tmpRec = parseInt($(myTableBody).attr("data-firstRecord"), 10);
-        var pageSize = parseInt($(myTableBody).attr("data-pageSize"), 10);
- 
-        // Define the new first record
-        if ($(this).attr("id") == "next") {
-            tmpRec += pageSize;
-        } else {
-            tmpRec -= pageSize;
-        }
-        // The first record is < of 0 or > of total rows
-        if (tmpRec < 0 || tmpRec > tableRows.length) return
- 
-        $(myTableBody).attr("data-firstRecord", tmpRec);
-        paginate(tmpRec, pageSize);
-    });
- 
-    // Paging function
-    var paginate = function (start, size) {
-        var tableRows = $(myTableRows);
-        var end = start + size;
-        // Hide all the rows
-        tableRows.hide();
-        // Show a reduced set of rows using a range of indices.
-        tableRows.slice(start, end).show();
-        // Show the pager
-        $(".paginate").show();
-        // If the first row is visible hide prev
-        if (tableRows.eq(0).is(":visible")) $('#previous').hide();
-        // If the last row is visible hide next
-        if (tableRows.eq(tableRows.length - 1).is(":visible")) $('#next').hide();
-    }
- 
-    // Table starting state
-    initTable();
- 
- 
-});
-$(function() {
-    $('#filter1').change(function() {
-        $("#table td.col1:contains('" + $(this).val() + "')").parent().show();
-        $("#table td.col1:not(:contains('" + $(this).val() + "'))").parent().hide();
-    });
-
-});
-$("#clmn_name").change(function () {
-    $(".all").hide();
-        $("." + $(this).find(":selected").attr("id")).show();});
-</script>
     <style>
         #pagination a {
 display:inline-block;
@@ -417,7 +336,16 @@ section{
   color:#ccc;
 }
     </style>
-    <script type="application/javascript">
+<script type="application/javascript">
+
+    var selSpeciality="Speciality";
+    var selState="State";
+    var rows=0;
+
+
+
+
+
         $(document).ready(function() {
   $(".search").keyup(function () {
     var searchTerm = $(".search").val();
@@ -444,6 +372,96 @@ section{
     else {$('.no-result').hide();}
 		  });
 });
+
+        $(document).ready(function() {
+    $('#filterSp').change(function() {
+        selSpeciality = $(this).find(':selected').val();
+        selSpeciality = selSpeciality.toString();
+
+var $rowsNo = $('#table tbody tr').show();
+if(selState==="State"){}
+else{
+    var $rowsNo = $('#table tbody tr').filter(function () {
+        if(selState!=="State"){
+            return $.trim($(this).find('td').eq(2).text()) !== selState
+        }
+    }).hide();
+}
+    rows=0;
+    var $rowsNo = $('#table tbody tr').filter(function () {
+        if(selSpeciality!=="Speciality"){
+            rows=rows+1;
+            return $.trim($(this).find('td').eq(1).text()) !== selSpeciality
+        }
+    }).hide();
+    alert(selSpeciality);
+    alert($rowsNo);
+    });
+
+});
+
+
+$(document).ready(function() {
+    $('#filterSt').change(function() {
+        selState = $(this).find(':selected').val();
+        selState = selState.toString();
+
+var $rowsNo = $('#table tbody tr').show();
+if(selSpeciality==="Speciality"){}
+else{
+    var $rowsNo = $('#table tbody tr').filter(function () {
+        if(selSpeciality!=="Speciality"){
+            return $.trim($(this).find('td').eq(1).text()) !== selSpeciality
+        }
+    }).hide();
+}
+    rows=0;
+    var $rowsNo = $('#table tbody tr').filter(function () {
+        if(selState!=="State"){
+            rows=rows+1;
+            return $.trim($(this).find('td').eq(2).text()) !== selState
+        }
+    }).hide();
+    alert(selState);
+    });
+
+});
+
+function Paging() {
+        var totalRows = $('#table').find('tbody tr:has(td)').length;
+        var recordPerPage = 100;
+        var totalPages = Math.ceil(totalRows / recordPerPage);
+        var $pages = $(' <button id="pages" >   </button> ');
+        for (i = 0; i < totalPages; i++) {
+            $('<span>&nbsp;' + (i + 1) + '</span>').appendTo($pages);
+        }
+        $pages.appendTo('#table');
+        $('.pageNumber').hover(
+            function () {
+                $(this).addClass('focus');
+            },
+            function () {
+                $(this).removeClass('focus');
+            }
+        );
+        $('table').find('tbody tr:has(td)').hide();
+        var tr = $('table tbody tr:has(td)');
+        for (var i = 0; i <= recordPerPage - 1; i++) {
+            $(tr[i]).show();
+        }
+        $('span').click(function (event) {
+            $('#table').find('tbody tr:has(td)').hide();
+            var nBegin = ($(this).text() - 1) * recordPerPage;
+            var nEnd = $(this).text() * recordPerPage - 1;
+            for (var i = nBegin; i <= nEnd; i++) {
+                $(tr[i]).show();
+            }
+        });
+
+}
+
+$(document).ready(Paging)
+
     </script>
 </head>
 <body>
@@ -478,16 +496,85 @@ section{
       <th class="col-md-5 col-xs-5">Name</th>
 
 
-          <th class="col-md-4 col-xs-4">
-              <div style="display: none">Speciality</div>
-              <select class="form-control" id="filter1">
-                  {% for full_name,speciality,state in content %}
-                  <option value="{{ speciality }}">{{ speciality }}</option>
-                  {% endfor %}
-              </select>
+          <th class="col-md-4 col-xs-4">Speciality
+              <div ></div>
+              <select class="form-control" id="filterSp">
+                    <option value="Speciality">Select...</option>
+                    <option value="Cardiologist">Cardiologist</option>
+                    <option value="Dentist">Dentist</option>
+                    <option value="Dermatologist">Dermatologist</option>
+                    <option value="ENT">ENT</option>
+                    <option value="General Physician">General Physician</option>
+                    <option value="Gynaecologist">Gynaecologist</option>
+                    <option value="Neurologist">Neurologist</option>
+                    <option value="Oncologist">Oncologist</option>
+                    <option value="Ophthalmologist">Ophthalmologist</option>
+                    <option value="Orthopaedist">Orthopaedist</option>
+                    <option value="Pediatric">Pediatric</option>
+                    <option value="Physiotherapist">Physiotherapist</option>
+                    <option value="Psychiatrist">Psychiatrist</option>
+                    <option value="Radiologist">Radiologist</option>
+                    <option value="Surgeon">Surgeon</option>
+                    <option value="Veterinary physician">Veterinary physician</option>
+                </select>
           </th>
 
-      <th class="col-md-3 col-xs-3">State</th>
+      <th class="col-md-3 col-xs-3">State
+              <div ></div>
+              <select class="form-control" id="filterSt">
+					<option value="State">Select...</option>
+					<option value="AL">AL</option>
+					<option value="AK">AK</option>
+					<option value="AZ">AZ</option>
+					<option value="AR">AR</option>
+					<option value="CA">CA</option>
+					<option value="CO">CO</option>
+					<option value="CT">CT</option>
+					<option value="DE">DE</option>
+					<option value="FL">FL</option>
+					<option value="GA">GA</option>
+					<option value="HI">HI</option>
+					<option value="ID">ID</option>
+					<option value="IL">IL</option>
+					<option value="IN">IN</option>
+					<option value="IA">IA</option>
+					<option value="KS">KS</option>
+					<option value="KY">KY</option>
+					<option value="LA">LA</option>
+					<option value="ME">ME</option>
+					<option value="MD">MD</option>
+					<option value="MA">MA</option>
+					<option value="MI">MI</option>
+					<option value="MN">MN</option>
+					<option value="MS">MS</option>
+					<option value="MO">MO</option>
+					<option value="MT">MT</option>
+					<option value="NE">NE</option>
+					<option value="NV">NV</option>
+					<option value="NH">NH</option>
+					<option value="NJ">NJ</option>
+					<option value="NM">NM</option>
+					<option value="NY">NY</option>
+					<option value="NC">NC</option>
+					<option value="ND">ND</option>
+					<option value="OH">OH</option>
+					<option value="OK">OK</option>
+					<option value="OR">OR</option>
+					<option value="PA">PA</option>
+					<option value="RI">RI</option>
+					<option value="SC">SC</option>
+					<option value="SD">SD</option>
+					<option value="TN">TN</option>
+					<option value="TX">TX</option>
+					<option value="UT">UT</option>
+					<option value="VT">VT</option>
+					<option value="VA">VA</option>
+					<option value="WA">WA</option>
+					<option value="WV">WV</option>
+					<option value="WI">WI</option>
+					<option value="WY">WY</option>
+                </select>
+      </th>
     </tr>
     <tr class="warning no-result">
       <td colspan="4"><i class="fa fa-warning"></i> No result</td>

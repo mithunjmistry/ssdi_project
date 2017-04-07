@@ -10,6 +10,27 @@
 <li><a style="background-color:#a7adba;" href="#tab_c" data-toggle="pill">Admit Patient</a></li>
 <li><a style="background-color:#a7adba;" href="#tab_d" data-toggle="pill">Discharge Patient</a></li>
     <li><a style="background-color:#a7adba;" href="/doctoradd/{{ user.get_username }}">Add Doctor</a></li>
+    <script type="text/javascript">
+     $(document).ready(function(){
+        $("#Patient").click(function(){
+            var patientId =  $(this).val();
+{#            $.post('/Admit/',{'patientId':patientId},function (data) {#}
+{#                $('#ReturnedValue').text(data);#}
+{#                alert(data.toString())#}
+{#            });#}
+            $.ajax({
+                 type:"POST",
+                 url:"/Admit/",
+                 data: {'patientId':patientId},
+                 success: function(){
+                     alert('Fd')
+                    }
+            });
+
+        });
+    })
+
+    </script>
 {% endblock %}
 
 {% block message %} <p>Welcome {{ user.get_username }}</p>{% endblock %}
@@ -21,11 +42,13 @@
         </div>
         <div class="tab-pane" id="tab_c">
              <h4>Admit</h4>
-            <div class="form-group">
-                 <label for="patientId">PatientId:</label>
-                    <input type="text" class="form-control" id="patientId">
-            </div>
+                <form id="Patient">
+                <label for="patient">PatientId</label>
+    <input id="patientID" type="text" name="patientID">
+    <input type="submit" value="OK">
+</form>
         </div>
+    <div id="ReturnedValue"></div>
         <div class="tab-pane" id="tab_d">
              <h4>Previous Bills</h4>
             <p>Here we will show his previous bills.</p>
