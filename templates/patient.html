@@ -6,7 +6,7 @@
 
 {% block side_options %}
     <li class="active"><a  style="background-color:#a7adba;" href="#tab_a" data-toggle="pill">My Home</a></li>
-<li><a style="background-color:#a7adba;" href="#tab_b" data-toggle="pill">View my Appointments</a></li>
+<li><a style="background-color:#a7adba;" href="/viewappointments/patient/{{ user.get_username }}">View my Appointments</a></li>
 <li><a style="background-color:#a7adba;" href="#tab_c" data-toggle="pill">My Prescriptions</a></li>
 <li><a style="background-color:#a7adba;" href="#tab_d" data-toggle="pill">Previous Bills</a></li>
 {% endblock %}
