@@ -318,19 +318,44 @@ def view_time(request, username):
             return redirect(book_appointment, username)
         elif 'Tuesday' in request.POST:
             dts = date_refined[1]
-            return redirect(book_appointment, username, full_name, dts, got_time, state)
+            request.session["name"] = full_name
+            request.session["date"] = dts
+            request.session["time"] = got_time
+            request.session["state"] = state
+            request.session["username"] = username
+            return redirect(book_appointment, username)
         elif 'Wednesday' in request.POST:
             dts = date_refined[2]
-            return redirect(book_appointment, username, full_name, dts, got_time, state)
+            request.session["name"] = full_name
+            request.session["date"] = dts
+            request.session["time"] = got_time
+            request.session["state"] = state
+            request.session["username"] = username
+            return redirect(book_appointment, username)
         elif 'Thursday' in request.POST:
             dts = date_refined[3]
-            return redirect(book_appointment, username, full_name, dts, got_time, state)
+            request.session["name"] = full_name
+            request.session["date"] = dts
+            request.session["time"] = got_time
+            request.session["state"] = state
+            request.session["username"] = username
+            return redirect(book_appointment, username)
         elif 'Friday' in request.POST:
             dts = date_refined[4]
-            return redirect(book_appointment, username, full_name, dts, got_time, state)
+            request.session["name"] = full_name
+            request.session["date"] = dts
+            request.session["time"] = got_time
+            request.session["state"] = state
+            request.session["username"] = username
+            return redirect(book_appointment, username)
         elif 'Saturday' in request.POST:
             dts = date_refined[5]
-            return redirect(book_appointment, username, full_name, dts, got_time, state)
+            request.session["name"] = full_name
+            request.session["date"] = dts
+            request.session["time"] = got_time
+            request.session["state"] = state
+            request.session["username"] = username
+            return redirect(book_appointment, username)
         else:
             error = "You cannot book appointment on Sunday"
     return render(request, "view_timings.html", {"content": content, "name": full_name, "speciality": speciality,
