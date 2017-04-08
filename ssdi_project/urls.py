@@ -34,5 +34,11 @@ urlpatterns = [
     url(r'^about/', TemplateView.as_view(template_name="about.html")),
     url(r'^testdb/', test_database, name="testdb"),
     url(r'^backenddb/', backend_adder, name="BackEndAdder"),
+    url(r'^viewtimings/(\w+)/', view_time, name="SpecificDoctorTime"),
+    url(r'^book/(\w+)/', book_appointment, name="BookAppointment"),
+    url(r'^viewappointments/patient/(\w+)/', view_appointments_patients, name="ViewAppointmentPatient"),
+    url(r'^viewappointments/doctor/(\w+)/', view_appointments_doctors, name="ViewAppointmentPatient"),
+    url(r'^deleteuser/(\w+)/', delete_user, name="ViewAppointmentPatient"),
+    url(r'^testurl/', test_page, name="TestPage"),
 ]
 

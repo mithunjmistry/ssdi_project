@@ -335,6 +335,8 @@ section{
   padding:8px;
   color:#ccc;
 }
+
+
     </style>
 <script type="application/javascript">
 
@@ -581,9 +583,9 @@ $(document).ready(Paging)
     </tr>
   </thead>
   <tbody>
-  {% for full_name,speciality,state in content %}
+  {% for full_name,speciality,state,username in content %}
       <th scope="row">{{ forloop.counter }}</th>
-      <td>{{ full_name }}</td>
+      <td><a href="/viewtimings/{{ username }}" style="color: black">{{ full_name }}</a></td>
       <td>{{ speciality }}</td>
       <td>{{ state }}</td>
     </tr>

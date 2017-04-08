@@ -31,6 +31,7 @@ class PatientPaymentHistory(EmbeddedDocument):
 class PatientAppointments(Appointments):
     state = StringField()
     under_doctor = StringField()
+    doctor_username = StringField()
 
 class Patient(Stakeholders):
     insured = BooleanField(required=True)
@@ -48,6 +49,7 @@ class Timings(EmbeddedDocument):
 
 class DoctorAppointments(Appointments):
     patient = StringField()
+    patient_username = StringField()
 
 class Doctor(Stakeholders):
     speciality = StringField(required=True, max_length=25)
