@@ -7,30 +7,9 @@
 {% block side_options %}
     <li class="active"><a style="background-color:#a7adba;" href="#tab_a" data-toggle="pill">My Home</a></li>
 <li><a style="background-color:#a7adba;" href="/beds/{{ user.get_username }}">View available beds</a></li>
-<li><a style="background-color:#a7adba;" href="#tab_c" data-toggle="pill">Admit Patient</a></li>
+<li><a style="background-color:#a7adba;" href="/admit/{{ user.get_username }}">Admit Patient</a></li>
 <li><a style="background-color:#a7adba;" href="#tab_d" data-toggle="pill">Discharge Patient</a></li>
     <li><a style="background-color:#a7adba;" href="/doctoradd/{{ user.get_username }}">Add Doctor</a></li>
-    <script type="text/javascript">
-     $(document).ready(function(){
-        $("#Patient").click(function(){
-            var patientId =  $(this).val();
-{#            $.post('/Admit/',{'patientId':patientId},function (data) {#}
-{#                $('#ReturnedValue').text(data);#}
-{#                alert(data.toString())#}
-{#            });#}
-            $.ajax({
-                 type:"POST",
-                 url:"/Admit/",
-                 data: {'patientId':patientId},
-                 success: function(){
-                     alert('Fd')
-                    }
-            });
-
-        });
-    })
-
-    </script>
 {% endblock %}
 
 {% block message %} <p>Welcome {{ user.get_username }}</p>{% endblock %}
@@ -41,14 +20,9 @@
             <p>Here we will show his appointments.</p>
         </div>
         <div class="tab-pane" id="tab_c">
-             <h4>Admit</h4>
-                <form id="Patient">
-                <label for="patient">PatientId</label>
-    <input id="patientID" type="text" name="patientID">
-    <input type="submit" value="OK">
-</form>
+             <h4>My Prescriptions</h4>
+            <p>Here we will show his prescriptions.</p>
         </div>
-    <div id="ReturnedValue"></div>
         <div class="tab-pane" id="tab_d">
              <h4>Previous Bills</h4>
             <p>Here we will show his previous bills.</p>
