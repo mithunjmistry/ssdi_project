@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^success/(\w+)/(\w+)', login_successful, name="success"),
     url(r'^timings/(\w+)/', set_office_hours, name="OfficeHours"),
     url(r'^beds/(\w+)/', check_beds, name="CheckBeds"),
+    url(r'^admit/(\w+)/', admit_patient, name="admitPatient"),
     url(r'^doctoradd/(\w+)/', doctor_add, name="doctoradd"),
     url(r'^about/', TemplateView.as_view(template_name="about.html")),
     url(r'^testdb/', test_database, name="testdb"),

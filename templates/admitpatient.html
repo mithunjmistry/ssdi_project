@@ -6,17 +6,25 @@
 {% block loggedusername %} {{ user.get_username }} {% endblock %}
 
 {% block side_options %}
+
     <li><a style="background-color:#a7adba;" href="/success/receptionist/{{ user.get_username }}">My Home</a></li>
     <li><a style="background-color:#a7adba;" href="/beds/{{ user.get_username }}">View available beds</a></li>
 <li><a style="background-color:#a7adba;" href="/admit/{{ user.get_username }}">Admit Patient</a></li>
-<li><a style="background-color:#a7adba;" href="/discharge/{{ user.get_username }}">Discharge Patient</a></li>
+<li><a style="background-color:#a7adba;" href="#tab_d" data-toggle="pill">Discharge Patient</a></li>
     <li><a style="background-color:#a7adba;" href="/doctoradd/{{ user.get_username }}">Add Doctor</a></li>
 
 
 {% endblock %}
 
 {% block message %}
-
+    {% if message %}
+        {{ message }}
+    {% endif %}
+{% if error %}
+		        <div class="alert alert-danger">
+                    <strong>Error!</strong> {{ error }}.
+                </div>
+                {% endif %}
 <form method="post">
     {% csrf_token %}
     			<div class="row vertical-center-row"   >
@@ -42,9 +50,9 @@
 				<input type="text" name="doctorName" class="form-control"  id="doctorName" required>
 				</div>
 				</div>
-    <input type="hidden" name="roomtype" class="form-control"  id="roomtype" value="bed" >
+    <input type="hidden" name="roomtype" class="form-control"  id="roomtype" value="roomtype" >
     <input type="hidden" name="room" class="form-control"  id="room" value="room">
-    <input type="hidden" name="bed" class="form-control"  id="bed" value="room">
+    <input type="hidden" name="bed" class="form-control"  id="bed" value="bed">
     <table id="tableRooms" class="table table-hover table-bordered ddtf-processed results" hidden>
   <thead>
     <tr>
@@ -71,7 +79,7 @@
 				</div>
 
 <form/>
-
+<p>{{ e }}</p>
 <script type="application/javascript">
 
     $(document).ready(function() {

@@ -36,6 +36,7 @@ class Patient(Stakeholders):
     currently_admitted = BooleanField(default=False)
     payment_records = ListField(EmbeddedDocumentField(PatientPaymentHistory))
     patient_appointments = ListField(EmbeddedDocumentField(PatientAppointments))
+    doctor_name = StringField(default=None)
 
 class TypeOfUser(Document):
     username = StringField(required=True)
@@ -55,6 +56,7 @@ class Doctor(Stakeholders):
     consulting_fees = FloatField(default=50.0)
     office_hours = ListField(EmbeddedDocumentField(Timings))
     doctor_appointments = ListField(EmbeddedDocumentField(DoctorAppointments))
+    patients_admitted= ListField(StringField())
 
 class Receptionist(Stakeholders):
     salary = FloatField(default=3500.0)
@@ -62,7 +64,11 @@ class Receptionist(Stakeholders):
 class Beds(Document):
     room_type = StringField(required=True)
     location = StringField(required=True, default="NC")
-    availability = IntField(default=0)
+    room_number = IntField(required=True)
+    bed_number = IntField(required=True)
+    patient_name = StringField(default=None)
+
+
 
 class Test(Document):
     id = IntField(primary_key=True)
