@@ -1,15 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <title>{% block title %}Welcome{% endblock %}</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+<script type="text/javascript" src="validator/src/js/bootstrapValidator.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
-  <style>
-    /* Remove the navbar's default margin-bottom and rounded borders */ 
+</head>
+
+<style>
+
+button{
+
+	margin-left:260px;
+}
+.container{
+	margin-left:120px;
+
+}
+.l1
+{
+    display:inline;
+}
+
     *{
   margin: 0;
     padding: 0;
@@ -192,9 +203,9 @@ section{
     .section-tagline{
         font-size: 1.3em;
     }
-    
+
 }
- 
+
 /*  portrait tablet */
 @media (max-width: 767px) {
     .container{
@@ -229,9 +240,9 @@ section{
     .section-tagline{
         font-size: 1.3em;
     }
-   
+
 }
- 
+
 /* Landscape phones and down */
 @media (max-width: 480px) {
     body{
@@ -245,7 +256,7 @@ section{
         overflow: hidden;
         -webkit-transition: all .3s ease;
     }
-    
+
     nav>a{
         padding: 0 1em;
         display: block;
@@ -278,7 +289,7 @@ section{
     .section-tagline{
         font-size: 1em;
     }
-   
+
     .hidden-desktop{
         display: block;
     }
@@ -292,17 +303,17 @@ section{
       margin-bottom: 0;
       border-radius: 0;
     }
-    
+
     /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
     .row.content {height: 550px}
-    
+
     /* Set gray background color and 100% height */
     .sidenav {
       padding-top: 20px;
       background-color: #f1f1f1;
       height: 100%;
     }
-    
+
     /* Set black background color, white text and some padding */
     footer {
       background-color: #555;
@@ -311,37 +322,9 @@ section{
     }
     .col-sm-2 sidenav{
       font-color:black;
-    
-}    
-    
-  </style>
-
-
-<script type="application/javascript">
-
-    $(document).ready(function() {
-    $('#filterRoom').change(function() {
-        roomType = $(this).find(':selected').val();
-        roomType = selSpeciality.toString();
-alert(roomType)
-var $rowsNo = $('#tableRooms tbody tr').show();
 
 }
-    var $rowsNo = $('#table tbody tr').filter(function () {
-        alert($.trim($(this).find('td').eq(1).text()))
-        if(roomType!==$.trim($(this).find('td').eq(1).text())){
-            return 1
-        }
-    }).hide();
-
-    });
-
-});
-
-</script>
-
-</head>
-
+</style>
 
 <nav class="navbar navbar-inverse">
   <div class="container">
@@ -354,50 +337,92 @@ var $rowsNo = $('#tableRooms tbody tr').show();
                 </label>
                 <input type="checkbox" name="" id="open">
                 <nav>
-                    <a href="#">{% block loggedusername %}Home {% endblock %}</a>
-                    <a href="/changepassword">Change Password</a>
-                    <a href="/deleteuser/{{ user.get_username }}">Delete User</a>
-                    <a href="/logout">Logout</a>
+                   <a href="/">Home</a>
+                    <a href="/doctors">Doctors</a>
+                    <a href="/about">About us</a>
+                    <a href="/register">Register</a>
+                    <a href="/login">Login</a>
                 </nav>
             </div>
         </div>
 </nav>
-<body>
 
-<div class="container">
-<ul class="nav nav-pills nav-stacked col-md-2">
-    {% block side_options %}
-  <li class="active"><a  style="background-color:#a7adba;" href="#tab_a" data-toggle="pill">My Home</a></li>
-
-  <li><a style="background-color:#a7adba;" href="#tab_b" data-toggle="pill">View an Appointments</a></li>
-  <li><a style="background-color:#a7adba;" href="#tab_c" data-toggle="pill">Patient's Prescrition</a></li>
-  <li><a style="background-color:#a7adba;" href="#tab_d" data-toggle="pill">Account Info</a></li>
-     {% endblock %}
-</ul>
-<div class="tab-content col-md-10">
+<div>
         <div class="tab-pane active" id="tab_a">
-            {% block message %} {% endblock %}
-        </div>
-            {% block side_options_messages %}
-        <div class="tab-pane" id="tab_b">
-             <h4>Pane B</h4>
-            <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames
-                ac turpis egestas.</p>
-        </div>
-        <div class="tab-pane" id="tab_c">
-             <h4>Pane C</h4>
-            <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames
-                ac turpis egestas.</p>
-        </div>
-        <div class="tab-pane" id="tab_d">
-             <h4>Pane D</h4>
-            <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames
-                ac turpis egestas.</p>
-        </div>
-        {% endblock %}
-</div><!-- tab content -->
-</div><!-- end of container -->
+             <h4>Details</h4>
+            {% if error %}
+		        <div class="alert alert-danger">
+                    <strong>Error!</strong> {{ error }}.
+                </div>
+                {% endif %}
+            
+    <div class= "jumbotron jumbotron-fluid " >
+        <table class="table">
+            <thead>
+            <tr>
+                <td>Doctor's Name: {{ name }}</td>
+                <td></td>        
+            </tr>
+        </thead>
+        
+        <tbody>
+            <tr>
+                <td>State: {{ location }}</td>
+                <td>Speciality: {{ speciality }}</td>
+            </tr>
+            <tr>
+                <td>Consulting Fees: ${{ consulting_fees }}</td>
+                <td>Contact: {{ contact }}</td>
+            </tr>
+        </tbody>
+        
+        </table>
+   	</div>
+    </div>
+   
+   <div class="container">
+
+<div class="well" style="width:1000px;">
+   <h2 style="text-align:center">Timings</h2><br><br>
+
+{% for k,l,time,date_refined,day in content %}
+<form method="post">
+{% csrf_token %}
+    <div class="form-group">
+      <label>{{ k }}</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    </div>
+
+    <div class="form-group">
+      <label>{{ time }}</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    </div>
+    
+    <div class="form-group">
+      <label >Available Timings:</label>
+      <select class="" style="width:200px;" id="slot" name="slot">
+          {% for i in l %}
+            <option>{{ i }}</option>
+            {% endfor %}
+        </select>
+    </div>
 
 
+    <div class="form-group">
+    <label id="date"><strong>Date:</strong> {{ date_refined }}</label>
+    </div>
 
+        <div class="form-group">
+    <button type="submit" class="btn btn-success" style="text-align:center;" id="bookmon" name="{{ day }}" value="book">Book</button>
+        </div>
+        <br>
+        <br>
+
+</form>
+        {% endfor %}
+
+
+</div>
+</div>
+</div>
+</html>
+       
 

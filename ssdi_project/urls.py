@@ -29,10 +29,16 @@ urlpatterns = [
     url(r'^success/(\w+)/(\w+)', login_successful, name="success"),
     url(r'^timings/(\w+)/', set_office_hours, name="OfficeHours"),
     url(r'^beds/(\w+)/', check_beds, name="CheckBeds"),
+    url(r'^admit/(\w+)/', admit_patient, name="admitPatient"),
     url(r'^doctoradd/(\w+)/', doctor_add, name="doctoradd"),
-    url(r'^Admit/',Admit_Patient,name="admitpatient"),
     url(r'^about/', TemplateView.as_view(template_name="about.html")),
     url(r'^testdb/', test_database, name="testdb"),
     url(r'^backenddb/', backend_adder, name="BackEndAdder"),
+    url(r'^viewtimings/(\w+)/', view_time, name="SpecificDoctorTime"),
+    url(r'^book/(\w+)/', book_appointment, name="BookAppointment"),
+    url(r'^viewappointments/patient/(\w+)/', view_appointments_patients, name="ViewAppointmentPatient"),
+    url(r'^viewappointments/doctor/(\w+)/', view_appointments_doctors, name="ViewAppointmentPatient"),
+    url(r'^deleteuser/(\w+)/', delete_user, name="ViewAppointmentPatient"),
+    url(r'^testurl/', test_page, name="TestPage"),
 ]
 

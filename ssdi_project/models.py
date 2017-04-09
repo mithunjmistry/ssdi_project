@@ -1,7 +1,5 @@
 from mongoengine import *
 
-
-
 class Stakeholders(Document):
     meta = {'allow_inheritance': True}
     username = StringField(required=True, primary_key=True)
@@ -31,12 +29,14 @@ class PatientPaymentHistory(EmbeddedDocument):
 class PatientAppointments(Appointments):
     state = StringField()
     under_doctor = StringField()
+    doctor_username = StringField()
 
 class Patient(Stakeholders):
     insured = BooleanField(required=True)
     currently_admitted = BooleanField(default=False)
     payment_records = ListField(EmbeddedDocumentField(PatientPaymentHistory))
     patient_appointments = ListField(EmbeddedDocumentField(PatientAppointments))
+    doctor_name = StringField(default=None)
 
 class TypeOfUser(Document):
     username = StringField(required=True)
@@ -48,6 +48,7 @@ class Timings(EmbeddedDocument):
 
 class DoctorAppointments(Appointments):
     patient = StringField()
+    patient_username = StringField()
 
 class Doctor(Stakeholders):
     speciality = StringField(required=True, max_length=25)
@@ -55,6 +56,7 @@ class Doctor(Stakeholders):
     consulting_fees = FloatField(default=50.0)
     office_hours = ListField(EmbeddedDocumentField(Timings))
     doctor_appointments = ListField(EmbeddedDocumentField(DoctorAppointments))
+    patients_admitted= ListField(StringField())
 
 class Receptionist(Stakeholders):
     salary = FloatField(default=3500.0)
@@ -65,6 +67,8 @@ class Beds(Document):
     room_number = IntField(required=True)
     bed_number = IntField(required=True)
     patient_name = StringField(default=None)
+
+
 
 class Test(Document):
     id = IntField(primary_key=True)
