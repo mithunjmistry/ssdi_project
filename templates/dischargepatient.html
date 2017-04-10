@@ -17,24 +17,37 @@
 
 {% block message %}
 
+        <div class="form-group pull-right">
+    <input type="text" class="search form-control" placeholder="What you looking for?">
+    </div>
+    <span class="counter pull-right"></span>
+
 <form method="post">
     {% csrf_token %}
-    			<div class="row vertical-center-row"   >
-				<div class="form-group col col-md-4 col-centered col-md-offset-1">
-				<label for="patients">Patient Name</label>
-				    <select class="form-control" id="filterPatient">
-                    <option value="Speciality">Select...</option>
-                        {% for x in d %}
-                            <option value="">x</option>
-                        {% endfor %}
-                        <option value="Emergency">Emergency</option>
-                        <option value="General">General</option>
-                        <option value="ICU">ICU</option>
-                </select></div>
-				</div>
 
-    <input type="hidden" name="roomtype" class="form-control"  id="roomtype" value="bed" >
-    <input type="hidden" name="room" class="form-control"  id="room" value="room">
+
+    <table id="table" class="table table-hover table-bordered ddtf-processed results">
+  <thead>
+    <tr>
+      <th class="col-md-5 col-xs-5">Name</th>
+      <th class="col-md-5 col-xs-5">ID</th>
+      <th class="col-md-5 col-xs-5">Doctor</th>
+      <th class="col-md-5 col-xs-5">Discharge</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for full_name,doctor_name,patient_id in content %}
+      <td>{{ full_name }}</td>
+      <td>{{ patient_id }}</td>
+      <td>{{ doctor_name }}</td>
+      <td><a style="color: black" id=row{{forloop.counter}}>{{ "Discharge" }}</a></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+    <input type="hidden" name="patientID" class="form-control"  id="patientID" value="" >
+    <input type="hidden" name="doctorName" class="form-control"  id="doctorName" value="">
     <input type="hidden" name="bed" class="form-control"  id="bed" value="room">
     <table id="tableRooms" class="table table-hover table-bordered ddtf-processed results" hidden>
   <thead>
@@ -46,7 +59,7 @@
   </thead>
   <tbody>
   {% for x in d %}
-        <td><a href="#" onclick="admitPatient();" style="color:black"> {{ x.room_type }}</a></td>
+        <td><a href="#" onclick="dischargePatient();" style="color:black"> {{ x.room_type }}</a></td>
       <td>{{ x.room_number }}</td>
       <td>{{ x.bed_number }}</td>
     </tr>
@@ -57,64 +70,103 @@
                 <div class="row">
 				<div class="form-group col col-md-4 col-md-offset-1">
 				<label for="submit"></label>
-				<input type="submit"  class="btn btn-success" name="Admit"  id="Admit"  value="Admit" disabled/>
+				<input type="submit"  class="btn btn-success" name="Discharge"  id="Discharge"  value="Discharge" disabled/>
 				</div>
 				</div>
+
+
+
+
 
 <form/>
 
 <script type="application/javascript">
 
-    $(document).ready(function() {
-    $('#filterRoom').change(function() {
-        var roomType = $(this).find(':selected').val();
-        roomType = roomType.toString();
 
-    var $rowsNo = $('#tableRooms').show();
-
-
-    var $rowsNo = $('#tableRooms  tbody tr').filter(function () {
-    if(roomType!==$.trim($(this).find('td').eq(0).text())){
-            return 1
+function Paging() {
+        var totalRows = $('#table').find('tbody tr:has(td)').length;
+        var recordPerPage = 100;
+        var totalPages = Math.ceil(totalRows / recordPerPage);
+        var $pages = $(' <button id="pages" >   </button> ');
+        for (i = 0; i < totalPages; i++) {
+            $('<span>&nbsp;' + (i + 1) + '</span>').appendTo($pages);
         }
-    }).hide();
-    var $rowsNo = $('#tableRooms  tbody tr').filter(function () {
-    if(roomType===$.trim($(this).find('td').eq(0).text())){
-            return 1
-        }
-    }).show();
-
-    });
-
-    $('#Admit').on("click",function() {
-        alert("========================ADMIT=========================")
-    });
-
-});
-
-    $('#filterPatient').click(function(){
-        $('#roomtype').val($(this).closest('td').text().toString())
-        $('#room').val($(this).closest('tr').text().toString().split("\n")[1])
-        $('#bed').val($(this).closest('tr').text().toString().split("\n")[2])
-        $(this).find('td').each (function() {
-
-});
-});
-
-    function admitPatient(){
-        var patientId =$("#patientID").val()
-        var doctorId = $("#doctorName").val()
-        if ((patientId!='') && (doctorId!='')){
-            $('#Admit').prop('disabled',false);
-                    $("#")
+        $pages.appendTo('#table');
+        $('.pageNumber').hover(
+            function () {
+                $(this).addClass('focus');
+            },
+            function () {
+                $(this).removeClass('focus');
             }
-            else{
-                    alert('Enter the patient Id and Doctor name first');
+        );
+        $('table').find('tbody tr:has(td)').hide();
+        var tr = $('table tbody tr:has(td)');
+        for (var i = 0; i <= recordPerPage - 1; i++) {
+            $(tr[i]).show();
         }
+        $('span').click(function (event) {
+            $('#table').find('tbody tr:has(td)').hide();
+            var nBegin = ($(this).text() - 1) * recordPerPage;
+            var nEnd = $(this).text() * recordPerPage - 1;
+            for (var i = nBegin; i <= nEnd; i++) {
+                $(tr[i]).show();
+            }
+        });
 
+}
 
+$(document).ready(Paging)
 
+$(document).ready(function() {
+  $(".search").keyup(function () {
+    var searchTerm = $(".search").val();
+    var listItem = $('.results tbody').children('tr');
+    var searchSplit = searchTerm.replace(/ /g, "'):containsi('")
+
+  $.extend($.expr[':'], {'containsi': function(elem, i, match, array){
+        return (elem.textContent || elem.innerText || '').toLowerCase().indexOf((match[3] || "").toLowerCase()) >= 0;
     }
+  });
+
+  $(".results tbody tr").not(":containsi('" + searchSplit + "')").each(function(e){
+    $(this).attr('visible','false');
+  });
+
+  $(".results tbody tr:containsi('" + searchSplit + "')").each(function(e){
+    $(this).attr('visible','true');
+  });
+
+  var jobCount = $('.results tbody tr[visible="true"]').length;
+    $('.counter').text(jobCount + ' item');
+
+  if(jobCount == '0') {$('.no-result').show();}
+    else {$('.no-result').hide();}
+		  });
+});
+
+$(document).ready(function() {
+        $('#Admit').on("click",function() {
+        alert("========================DISCHARGE=========================")
+    });
+});
+
+
+
+{% for full_name,doctor_name in content %}
+      $('#row{{ forloop.counter }}').on("click",function() {
+        alert($(this).closest('tr').text().toString())
+        alert($(this).closest('tr').text().toString().split("\n")[1])
+        alert($(this).closest('tr').text().toString().split("\n")[2])
+        $('#patientID').val($(this).closest('tr').text().toString().split("\n")[1])
+        $('#doctorName').val($(this).closest('tr').text().toString().split("\n")[2])
+        if (($('#patientID').val!='') && ($('#doctorName').val!='')){
+            $('#Discharge').prop('disabled',false);
+        }
+        $(this).find('td').each (function() { });
+    });
+  {% endfor %}
+
 
 </script>
 

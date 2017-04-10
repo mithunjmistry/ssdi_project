@@ -8,7 +8,7 @@
     <li class="active"><a style="background-color:#a7adba;" href="#tab_a" data-toggle="pill">My Home</a></li>
 <li><a style="background-color:#a7adba;" href="/beds/{{ user.get_username }}">View available beds</a></li>
 <li><a style="background-color:#a7adba;" href="/admit/{{ user.get_username }}">Admit Patient</a></li>
-<li><a style="background-color:#a7adba;" href="#tab_d" data-toggle="pill">Discharge Patient</a></li>
+<li><a style="background-color:#a7adba;" href="/discharge/{{ user.get_username }}">Discharge Patient</a></li>
     <li><a style="background-color:#a7adba;" href="/doctoradd/{{ user.get_username }}">Add Doctor</a></li>
 {% endblock %}
 
