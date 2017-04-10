@@ -171,14 +171,99 @@ def delete_user(request, username):
     except:
         return HttpResponse("Oops! Something went wrong!")
 
+def get_clean_timings_array(text):
+    to_return = []
+    if text.lower() != "holiday":
+        a = text.split(",")
+        b = a[0].split("to")
+        inter = []
+        t2_one = ""
+        t2_two = ""
+        if len(b) >= 2:
+            t1_one = b[0].strip()
+            t1_two = b[1].strip()
+        if len(a) >= 2:
+            c = a[1].strip()
+            d = c.split("to")
+            if len(d) >= 2:
+                t2_one = d[0].strip()
+                t2_two = d[1].strip()
+        inter.append(t1_one)
+        inter.append(t1_two)
+        for i in range(0, len(a)):
+            if len(inter[0]) < 6:
+                m = inter[0].split()
+                m = str(m[0]) + ":00 " + m[1]
+            else:
+                m = inter[0].strip()
+
+            if len(inter[1].strip()) < 6:
+                m1 = inter[1].split()
+                m1 = str(m1[0]) + ":00 " + m1[1]
+            else:
+                m1 = inter[1].strip()
+
+            to_return.append(m)
+            to_return.append(m1)
+        return to_return
+    else:
+        return ["Not available"]
+
 
 @login_required
 @never_cache
-def set_office_hours(request, username):
+def set_office_hours(request, username, day):
+    time_o = []
+    time = ""
+    message = None
     if FactoryUserStatus(username) == "doctor":
-        return "Hi"
-    else:
-        return redirect(login_page)
+        if request.POST:
+            time1 = request.POST.get("starttime")
+            time2 = request.POST.get("endtime")
+            time3 = request.POST.get("starttime2")
+            time4 = request.POST.get("endtime2")
+            new_time = "{} to {}, {} to {}".format(time1, time2, time3, time4)
+            Doctor.objects.filter(username=username, office_hours__day=day).update(
+                set__office_hours__S__time=new_time)
+            message = "Office hours updated successfully."
+            d = Doctor.objects(username=username).only("office_hours").first()
+            for i in d.office_hours:
+                time_o.append(i.time)
+            if day.lower() == "monday":
+                time = time_o[0]
+            elif day.lower() == "tuesday":
+                time = time_o[1]
+            elif day.lower() == "wednesday":
+                time = time_o[2]
+            elif day.lower() == "thursday":
+                time = time_o[3]
+            elif day.lower() == "friday":
+                time = time_o[4]
+            elif day.lower() == "saturday":
+                time = time_o[5]
+            else:
+                time = "Incorrect Day"
+            return render(request, "setofficehours.html", {"time": time, "message": message})
+        d = Doctor.objects(username=username).only("office_hours").first()
+        for i in d.office_hours:
+            time_o.append(i.time)
+        if day.lower() == "monday":
+            time = time_o[0]
+        elif day.lower() == "tuesday":
+            time = time_o[1]
+        elif day.lower() == "wednesday":
+            time = time_o[2]
+        elif day.lower() == "thursday":
+            time = time_o[3]
+        elif day.lower() == "friday":
+            time = time_o[4]
+        elif day.lower() == "saturday":
+            time = time_o[5]
+        else:
+            time = "Incorrect Day"
+        return render(request, "setofficehours.html", {"time": time, "message": message})
+
+
 
 
 @login_required
@@ -499,4 +584,5 @@ def backend_adder(request):
 
 
 def test_page(request):
-    return render(request, "appointment_booked.html")
+    Doctor.objects.filter(username="dcole0", office_hours__day="Monday").update(set__office_hours__S__time="9 am to 10 am, 5 pm to 6 pm")
+    return HttpResponse("hi")

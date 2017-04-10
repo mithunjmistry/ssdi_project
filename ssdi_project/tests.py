@@ -70,8 +70,6 @@ class MyTestCase(unittest.TestCase):
         get_req.user=User()
         self.assertTrue(login_successful(get_req,"receptionist","rachel"))
 
-
-
     def test_check_login_page_POST(self):
         from django.http import HttpRequest
         from views import login_page
@@ -83,28 +81,71 @@ class MyTestCase(unittest.TestCase):
         #print response.status_code
         self.assertTrue(login_page(get_req))
 
+    # Test that ShowDoctors does not return None
+    def test_show_doctors(self):
+        from django.http import HttpRequest
+        from views import show_doctors
+        testrequest = HttpRequest()
+        self.assertIsNotNone(show_doctors(testrequest))
+
+    # View appointments for Doctors
+    def test_view_appointments_doctors(self):
+        from django.http import HttpRequest
+        from views import view_appointments_doctors
+        testrequest = HttpRequest()
+        testuser = User()
+        testuser.username='dcole0'
+        testuser.password='1234567890'
+        testuser.is_active = True
+        testrequest.user = testuser
+        self.assertIsNotNone(view_appointments_doctors(testrequest,testrequest.user.username))
+
+    # View appointments for Patients
+    def test_view_appointments_patients(self):
+        from django.http import HttpRequest
+        from views import view_appointments_patients
+        testrequest = HttpRequest()
+        testuser = User()
+        testuser.username = 'sscott0'
+        testuser.password = '1234567890'
+        testuser.is_active = True
+        testrequest.user = testuser
+        self.assertIsNotNone(view_appointments_patients(testrequest, testrequest.user.username))
 
 
-    '''
-    def test_login_successful(self):
-        v = views()
-        request = RequestFactory()
-        post_request = request.post('/submit/', {'foo': 'bar'})
-        self.assertEquals("{}.html.format(loggeduserstatus), {message: How you doing today: {}.format(loggedusername)",
-                          v.login_successful(request, "receptionist", "rachel"))
-                          '''
-    ''' def test_check_login_page_getusername(self):
-            from views import login_page
-            from django.http import HttpRequest
-            get_req= HttpRequest()
-            get_req.user=User()
-            get_req.user.username="Monika"
-            get_req.user.password="123456"
-            from django.test import Client
-            c = Client()
-            #response=c.login(self)
-            response = c.login(username='Monika',password='123456')
-            self.assertTrue(login_page(get_req))'''
+    # View Time for patients
+    def test_view_time(self):
+        from django.http import HttpRequest
+        from views import view_time
+        testrequest = HttpRequest()
+        testuser = User()
+        testuser.username = 'dcole0'
+        testuser.password = '1234567890'
+        testuser.is_active = True
+        testrequest.user = testuser
+        self.assertIsNotNone(view_time(testrequest, testrequest.user.username))
+
+    # Test Admit Patient
+    def test_admit_patient(self):
+        import requests
+        from views import admit_patient
+        import json
+        headers = {'content-type': 'application/json'}
+        url = 'http://127.0.0.1:8000/admit/aferguson0/'
+        data = {"data": {"patientID": None}}
+        params = {'sessionKey': '9ebbd0b25760557393a43064a92bae539d962103', 'format': 'xml', 'platformId': 1}
+        self.assertIsNotNone(requests.post(url, params={}, data=json.dumps(data), headers=None))
+
+
+    # Test Add Doctors
+    def test_doctor_add(self):
+        from views import  doctor_add
+        import requests
+        import json
+        url = 'http://127.0.0.1:8000/doctoradd/aferguson0/'
+        data = {"data": {"patientID": None}}
+        params = {'sessionKey': '9ebbd0b25760557393a43064a92bae539d962103', 'format': 'xml', 'platformId': 1}
+        self.assertIsNotNone(requests.post(url, params={}, data=json.dumps(data), headers=None))
 
 if __name__ == '__main__':
     unittest.main()
