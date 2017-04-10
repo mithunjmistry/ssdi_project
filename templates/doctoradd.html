@@ -7,8 +7,8 @@
 {% block side_options %}
     <li><a style="background-color:#a7adba;" href="/success/receptionist/{{ user.get_username }}">My Home</a></li>
 <li><a style="background-color:#a7adba;" href="/beds/{{ user.get_username }}">View available beds</a></li>
-<li><a style="background-color:#a7adba;" href="#tab_c" data-toggle="pill">Admit Patient</a></li>
-<li><a style="background-color:#a7adba;" href="#tab_d" data-toggle="pill">Discharge Patient</a></li>
+<li><a style="background-color:#a7adba;" href="/admit/{{ user.get_username }}">Admit Patient</a></li>
+<li><a style="background-color:#a7adba;" href="/discharge/{{ user.get_username }}">Discharge Patient</a></li>
     <li class="active"><a style="background-color:#a7adba;" href="#tab_a" data-toggle="pill">Add Doctor</a></li>
 {% endblock %}
 

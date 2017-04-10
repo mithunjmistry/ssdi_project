@@ -110,6 +110,41 @@ class Bedsh():
     bed_number = IntField(required=True)
     patient_name = StringField(default=None)
 
+@login_required
+@never_cache
+def discharge_patient(request, username):
+    if FactoryUserStatus(username) == "receptionist":
+        t = Receptionist.objects(username=username).only('state').first()
+        if request.POST.get("patientID") != None:
+            patientID = str(request.POST.get("patientID")).strip()
+            doctorName = str(request.POST.get("doctorName"))
+            for b in Beds.objects():
+                if (b.patient_name == patientID):
+                    room_t = str(b.room_type)
+                    room_no = int(b.room_number)
+                    bed_no = int(b.bed_number)
+                    loc = str(b.location)
+                    break
+            Patient.objects(username=patientID).update_one(set__currently_admitted=False)
+            Patient.objects(username=patientID).update_one(set__doctor_name=None)
+            Doctor.objects(username=patientID).update_one(pull__patients_admitted='')
+            Beds.objects(room_type=room_t, room_number=room_no, bed_number=bed_no, location=loc). \
+                update_one(set__patient_name=None)
+                    #return HttpResponse("Removed by backend.")
+    else:
+        return redirect(login_page)
+    full_name = []
+    doctor_name = []
+    patient_id = []
+    for patient in Patient.objects.only('first_name', 'last_name', 'doctor_name', 'username', 'currently_admitted'):
+        if(patient.currently_admitted):
+            full_name.append(str(patient.first_name + " " + patient.last_name))
+            doctor_name.append(str(patient.doctor_name))
+            patient_id.append(str(patient.username))
+    content = zip(full_name, doctor_name, patient_id)
+    return render(request, "dischargepatient.html",
+                  {"content": content})
+
 
 @login_required
 @never_cache
