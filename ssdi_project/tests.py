@@ -56,30 +56,22 @@ class MyTestCase(unittest.TestCase):
         from views import check_beds
         get_req = HttpRequest()
         get_req.user=User()
-        get_req.user.username="rachel"
+        get_req.user.username="aferguson0"
         get_req.user.password="1234567890"
         from django.test import Client
         c = Client()
         response= c.post('/check_beds/')
-        self.assertIsNotNone(check_beds(get_req,'rachel'))
+        self.assertIsNotNone(check_beds(get_req,'aferguson0'))
 
-    def test_login_sucessfull(self):
-        from views import login_successful
-        from django.http import HttpRequest
-        get_req = HttpRequest()
-        get_req.user=User()
-        self.assertTrue(login_successful(get_req,"receptionist","rachel"))
 
     def test_check_login_page_POST(self):
-        from django.http import HttpRequest
-        from views import login_page
-        get_req = HttpRequest()
-        self.user = User.objects.create_user(
-            username='pheebs', email='mithunjmistry@gmail.com', password='1234567890')
-        get_req.user = self.user
-        response = login_page(get_req)
-        #print response.status_code
-        self.assertTrue(login_page(get_req))
+        import requests
+        from views import admit_patient
+        import json
+        headers = {'content-type': 'application/json'}
+        url = 'http://127.0.0.1:8000/login/'
+        data = {"data": {"username": "dcole0","password":"1234567890"}}
+        self.assertIsNotNone(requests.post(url, params={}, data=json.dumps(data), headers=None))
 
     # Test that ShowDoctors does not return None
     def test_show_doctors(self):
@@ -146,6 +138,40 @@ class MyTestCase(unittest.TestCase):
         data = {"data": {"patientID": None}}
         params = {'sessionKey': '9ebbd0b25760557393a43064a92bae539d962103', 'format': 'xml', 'platformId': 1}
         self.assertIsNotNone(requests.post(url, params={}, data=json.dumps(data), headers=None))
+
+    def test_patient_discharge(self):
+        import requests
+        from views import admit_patient
+        import json
+        headers = {'content-type': 'application/json'}
+        url = 'http://127.0.0.1:8000/discharge/aferguson0/'
+        data = {"data": {"patientID": None}}
+        params = {'sessionKey': '9ebbd0b25760557393a43064a92bae539d962103', 'format': 'xml', 'platformId': 1}
+        self.assertIsNotNone(requests.post(url, params={}, data=json.dumps(data), headers=None))
+
+    def test_set_office_hours(self):
+        import requests
+        from views import set_office_hours
+        import json
+        headers = {'content-type': 'application/json'}
+        url = 'http://127.0.0.1:8000/timings/dcole0/monday'
+        data = {"data": {"starttime": '2.30pm',"endtime": '3.30pm','starttime2':'5.30pm',
+                         'endtime2':'8.30pm'}}
+        params = {'sessionKey': '9ebbd0b25760557393a43064a92bae539d962103', 'format': 'xml', 'platformId': 1}
+        self.assertIsNotNone(requests.post(url, params={}, data=json.dumps(data), headers=None))
+
+
+    def test_option_maker(self):
+        from views import option_maker
+        retVal = option_maker('holiday')
+        for i in retVal:
+            print i
+        self.assertIsNotNone(retVal)
+
+    def test_get_clean_timings_array(self):
+        from views import get_clean_timings_array
+        retVal = get_clean_timings_array('holiday')
+        self.assertIsNotNone(retVal)
 
 if __name__ == '__main__':
     unittest.main()
