@@ -95,12 +95,15 @@ def check_beds(request, username):
     if FactoryUserStatus(username) == "receptionist":
         t = Receptionist.objects(username=username).only('state').first()
         b = Beds.objects(location=t.state).exclude('location')
-        d = {}
+        d = []
         for i in b:
-            d[i.room_type] = i.availability
+            bed = Bedsh()
+            bed = i
+            d.append(bed)
         return render(request, "checkbeds.html", {"d": d})
     else:
         return redirect(login_page)
+
 
 
 class Bedsh():
@@ -362,7 +365,7 @@ def show_doctors(request):
                   {"content": content})
 
 
-def option_maker(text):
+def option_maker(text, doctor_username, day):
     to_return = []
     if text.lower() != "holiday":
         a = text.split(",")
@@ -396,17 +399,24 @@ def option_maker(text):
 
             time_obj = datetime.strptime(m, '%I:%M %p')
             time_obj_two = datetime.strptime(m1, '%I:%M %p')
+            print time_obj_two
 
             to_return.append(time_obj.strftime("%H:%M %p")[:-3])
             while time_obj != time_obj_two:
                 time_obj += timedelta(minutes=15)
                 to_return.append(time_obj.strftime("%H:%M %p")[:-3])
+            del to_return[-1]
             inter[0] = t2_one
             inter[1] = t2_two
-        return to_return
+        booked_timings = []
+        doctor = Doctor.objects(username=doctor_username).only("doctor_appointments").first()
+        for i in doctor.doctor_appointments:
+            if datetime.strptime(i.date, "%Y-%m-%d").strftime("%A").lower() == day.lower():
+                booked_timings.append(i.time)
+        to_return_final = [x for x in to_return if x not in booked_timings]
+        return to_return_final
     else:
         return ["Not available"]
-
 
 @login_required
 @never_cache
@@ -489,7 +499,7 @@ def view_time(request, username):
         for idx, i in enumerate(doctor.office_hours):
             day.append(i.day)
             time.append(i.time)
-            d[str(idx + 1) + ". " + i.day] = option_maker(str(i.time))
+            d[str(idx + 1) + ". " + i.day] = option_maker(str(i.time), username, str(i.day))
 
         full_name = str(doctor.first_name) + " " + str(doctor.last_name)
         speciality = doctor.speciality
@@ -619,5 +629,9 @@ def backend_adder(request):
 
 
 def test_page(request):
-    Doctor.objects.filter(username="dcole0", office_hours__day="Monday").update(set__office_hours__S__time="9 am to 10 am, 5 pm to 6 pm")
+    #Doctor.objects.filter(username="dcole0", office_hours__day="Monday").update(set__office_hours__S__time="9 am to 10 am, 5 pm to 6 pm")
+    b2 = Beds.objects.create(room_type="AC Deluxe", room_number=10, bed_number=1)
+    b2.save()
+    b2 = Beds.objects.create(room_type="AC Deluxe", room_number=11, bed_number=2)
+    b2.save()
     return HttpResponse("hi")
