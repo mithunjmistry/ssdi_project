@@ -69,7 +69,6 @@ def login_page(request):
         upass = request.POST.get("password")
         user = authenticate(username=username, password=upass)
         if user is not None:
-            request.session.set_expiry(300)
             login(request, user)
             UserType = FactoryUserStatus(username)
             return redirect(login_successful, UserType, username)
@@ -637,8 +636,14 @@ def test_page(request):
     b2.save()
     
     return HttpResponse("hi")
+    .update(pull__transfer_request__patient_id="mscottv")
     '''
-    return render(request, "transferpatient.html", {"name": "Mithun", "location": "NC"})
+    d = Doctor.objects.filter(transfer_request__patient_id="mscottv")
+    print d
+    for doctor in d:
+        for i in doctor.transfer_request:
+            print i.patient_name
+    return HttpResponse("Hey")
 
 @never_cache
 @login_required
@@ -650,19 +655,22 @@ def transferpatient(request, receptionist_username, patient_username):
             doctorID = request.POST.get("doctorID").strip()
             description = request.POST.get("description").strip()
             doctor = Doctor.objects(username=doctorID).first()
-            if doctor:
-                if doctor.state != patient.state:
-                    try:
-                        doctor.transfer_request.append(TransferRequests(patient_id=patient_username, patient_name="{} {}".format(patient.first_name, patient.last_name),
-                                                                        location=patient.state, description=description))
-                        doctor.save()
-                        return render(request, "ptransfers.html")
-                    except:
-                        error ="Something went wrong. Try again!"
-                else:
-                    error = "No need for approvals in internal transfer."
+            if Doctor.objects.filter(transfer_request__patient_id="mscottv"):
+                error = "Patient transfer request already initiated"
             else:
-                error = "Doctor ID is not valid."
+                if doctor:
+                    if doctor.state != patient.state:
+                        try:
+                            doctor.transfer_request.append(TransferRequests(patient_id=patient_username, patient_name="{} {}".format(patient.first_name, patient.last_name),
+                                                                            location=patient.state, description=description))
+                            doctor.save()
+                            return render(request, "ptransfers.html")
+                        except:
+                            error ="Something went wrong. Try again!"
+                    else:
+                        error = "No need for approvals in internal transfer."
+                else:
+                    error = "Doctor ID is not valid."
         return render(request, "transferpatient.html", {"name": "{} {}".format(patient.first_name, patient.last_name),
                                                         "location": patient.state, "contact": patient.state, "error": error})
     else:

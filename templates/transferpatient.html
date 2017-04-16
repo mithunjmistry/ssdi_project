@@ -69,9 +69,10 @@
                     //$("#doctor_info").text(data);
                     //$("#comment_input").val('').focus();
                     if (String(data).toLowerCase() !== "no doctor found."){
-                        var iden = str.split(" ", 3);
-                        $("#doctorID").val(iden[2]);
-                        $("#transfer").prop('disabled', false);
+                            var iden = str.split(" ", 3);
+                            var iden = str.split(" ", 3);
+                            $("#doctorID").val(iden[2]);
+                            $("#transfer").prop('disabled', false);
                     }
                     else{
                         $("#doctorID").val("");
@@ -120,7 +121,7 @@
     <div class="row vertical-center-row"   >
 				<div class="form-group col col-md-4 col-centered col-md-offset-1">
 				<label for="doctorID">Doctor ID</label>
-                    <input type="text" name="doctorID" class="form-control"  id="doctorID" value="" required>
+                    <input type="text" name="doctorID" class="form-control"  id="doctorID" value="" required autocomplete="off">
 				</div>
 				</div>
 
@@ -133,7 +134,7 @@
         <div class="row vertical-center-row"   >
 				<div class="form-group col col-md-4 col-centered col-md-offset-1">
 				<label for="doctorID">Doctor Name</label>
-                    <input type="text" name="doctorName" class="form-control"  id="doctorName" value="">
+                    <input type="text" name="doctorName" class="form-control"  id="doctorName" value="" autocomplete="off">
 				</div>
 				</div>
 
