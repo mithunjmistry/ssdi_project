@@ -637,12 +637,75 @@ def test_page(request):
     
     return HttpResponse("hi")
     .update(pull__transfer_request__patient_id="mscottv")
-    '''
+    
     d = Doctor.objects.filter(transfer_request__patient_id="mscottv")
     print d
     for doctor in d:
         for i in doctor.transfer_request:
             print i.patient_name
+    
+    states = [
+    "AK",
+    "AL",
+    "AR",
+    "AZ",
+    "CA",
+    "CO",
+    "CT",
+    "DE",
+    "FL",
+    "GA",
+    "HI",
+    "IA",
+    "ID",
+    "IL",
+    "IN",
+    "KS",
+    "KY",
+    "LA",
+    "MA",
+    "MD",
+    "ME",
+    "MI",
+    "MN",
+    "MO",
+    "MS",
+    "MT",
+    "NC",
+    "ND",
+    "NE",
+    "NH",
+    "NJ",
+    "NM",
+    "NV",
+    "NY",
+    "OH",
+    "OK",
+    "OR",
+    "PA",
+    "RI",
+    "SC",
+    "SD",
+    "TN",
+    "TX",
+    "UT",
+    "VA",
+    "VT",
+    "WA",
+    "WI",
+    "WV",
+    "WY"]
+    for i in states:
+        b2 = Beds.objects.create(room_type="Transfer", location=i)
+        b2.save()
+        b3 = Beds.objects.create(room_type="Transfer", location=i)
+        b3.save()
+        b4 = Beds.objects.create(room_type="Transfer", location=i)
+        b4.save()
+    '''
+    doctor = Doctor.objects(username="dcole0").first()
+    for d in doctor.patients_admitted:
+        print d
     return HttpResponse("Hey")
 
 @never_cache
@@ -675,6 +738,55 @@ def transferpatient(request, receptionist_username, patient_username):
                                                         "location": patient.state, "contact": patient.state, "error": error})
     else:
         return redirect(login_page)
+
+@never_cache
+@login_required
+def view_transfer_consents(request, doctor_username):
+    if Doctor.objects(username=doctor_username).only("username").first():
+        name = []
+        location = []
+        description = []
+        patient_id = []
+        d = Doctor.objects.filter(username=doctor_username, transfer_request__consent=False)
+        for doctor in d:
+            for i in doctor.transfer_request:
+                name.append(i.patient_name)
+                location.append(i.location)
+                description.append(i.description)
+                patient_id.append(i.patient_id)
+        content = zip(name, location, description, patient_id)
+        return render(request, "doctorconsent.html", {"content": content})
+    else:
+        return redirect(login_page)
+
+
+@login_required
+@never_cache
+def approve_transfer_consent(request, doctor_id, patient_id):
+    doctor = Doctor.objects(username=doctor_id).only("state").first()
+    if doctor:
+        Beds.objects(room_type="Transfer", location=doctor.state). \
+            update_one(set__patient_name=patient_id)
+        Patient.objects(username=patient_id).update(set__doctor_name=doctor_id)
+        Doctor.objects(username=doctor_id).update(push__patients_admitted=patient_id)
+        Doctor.objects.filter(transfer_request__patient_id=patient_id).update(pull__transfer_request__patient_id=patient_id)
+        Beds.objects(patient_name=patient_id). \
+            update_one(set__patient_name=None)
+        return render(request, "transferaccept.html")
+    else:
+        return redirect(login_page)
+
+
+@login_required
+@never_cache
+def reject_transfer_consent(request, doctor_id, patient_id):
+    doctor = Doctor.objects(username=doctor_id).only("state").first()
+    if doctor:
+        Doctor.objects.filter(transfer_request__patient_id=patient_id).update(pull__transfer_request__patient_id=patient_id)
+        return render(request, "transferreject.html")
+    else:
+        return redirect(login_page)
+
 
 def validate_doctor(request):
     if request.POST:

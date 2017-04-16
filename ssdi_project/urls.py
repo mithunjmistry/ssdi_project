@@ -43,5 +43,8 @@ urlpatterns = [
     url(r'^testurl/', test_page, name="TestPage"),
     url(r'^validatedoctor/', validate_doctor, name="ValidateDoctor"),
     url(r'^transfer/(\w+)/(\w+)/', transferpatient, name="TransferPatient"),
+    url(r'^tconsent/(\w+)/', view_transfer_consents, name="ViewTransferConsent"),
+    url(r'^transferapprove/(\w+)/(\w+)/', approve_transfer_consent, name="TransferApprove"),
+    url(r'^transferreject/(\w+)/(\w+)/', reject_transfer_consent, name="TransferReject"),
 ]
 

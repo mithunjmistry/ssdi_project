@@ -72,8 +72,8 @@ class Receptionist(Stakeholders):
 class Beds(Document):
     room_type = StringField(required=True)
     location = StringField(required=True, default="NC")
-    room_number = IntField(required=True)
-    bed_number = IntField(required=True)
+    room_number = IntField(default=8)
+    bed_number = IntField(default=8)
     patient_name = StringField(default=None)
 
 
