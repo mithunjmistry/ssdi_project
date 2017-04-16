@@ -50,6 +50,13 @@ class DoctorAppointments(Appointments):
     patient = StringField()
     patient_username = StringField()
 
+class TransferRequests(EmbeddedDocument):
+    patient_id = StringField(required=True)
+    patient_name = StringField()
+    location = StringField()
+    description = StringField()
+    consent = BooleanField(default=False)
+
 class Doctor(Stakeholders):
     speciality = StringField(required=True, max_length=25)
     status = BooleanField(required=True)
@@ -57,6 +64,7 @@ class Doctor(Stakeholders):
     office_hours = ListField(EmbeddedDocumentField(Timings))
     doctor_appointments = ListField(EmbeddedDocumentField(DoctorAppointments))
     patients_admitted= ListField(StringField())
+    transfer_request = ListField(EmbeddedDocumentField(TransferRequests))
 
 class Receptionist(Stakeholders):
     salary = FloatField(default=3500.0)
