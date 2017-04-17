@@ -9,6 +9,7 @@
 <li><a style="background-color:#a7adba;" href="/viewappointments/doctor/{{ user.get_username }}">View my Appointments</a></li>
 <li><a style="background-color:#a7adba;" href="/timings/{{ user.get_username }}/Monday">Set Office hours</a></li>
 <li><a style="background-color:#a7adba;" href="#tab_d" data-toggle="pill">Set consultation fees</a></li>
+    <li><a style="background-color:#a7adba;" href="/tconsent/{{ user.get_username }}/">Transfer Consent</a></li>
 {% endblock %}
 
 {% block message %}<p> {{ message }} </p> {% endblock %}

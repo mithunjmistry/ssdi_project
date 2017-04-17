@@ -96,12 +96,15 @@ def check_beds(request, username):
     if FactoryUserStatus(username) == "receptionist":
         t = Receptionist.objects(username=username).only('state').first()
         b = Beds.objects(location=t.state).exclude('location')
-        d = {}
+        d = []
         for i in b:
-            d[i.room_type] = i.availability
+            bed = Bedsh()
+            bed = i
+            d.append(bed)
         return render(request, "checkbeds.html", {"d": d})
     else:
         return redirect(login_page)
+
 
 
 class Bedsh():
@@ -219,11 +222,12 @@ def admit_patient(request, username):
         d = []
         for i in b:
             if i.patient_name == None:
-                bed = Bedsh()
                 bed = i
                 d.append(bed)
-        if cnt ==1:
-            return render(request, "admitpatient.html", {'d': d,'message':'Patient admitted'})
+            else:
+                print i.patient_name
+        if cnt == 1:
+            return render(request, "admitpatient.html", {'d': d, 'message':'Patient admitted'})
         else:
             return render(request, "admitpatient.html", {'d': d})
     else:
@@ -397,7 +401,7 @@ def show_doctors(request):
                   {"content": content})
 
 
-def option_maker(text):
+def option_maker(text, doctor_username, day):
     to_return = []
     if text.lower() != "holiday":
         a = text.split(",")
@@ -436,12 +440,18 @@ def option_maker(text):
             while time_obj != time_obj_two:
                 time_obj += timedelta(minutes=15)
                 to_return.append(time_obj.strftime("%H:%M %p")[:-3])
+            del to_return[-1]
             inter[0] = t2_one
             inter[1] = t2_two
-        return to_return
+        booked_timings = []
+        doctor = Doctor.objects(username=doctor_username).only("doctor_appointments").first()
+        for i in doctor.doctor_appointments:
+            if datetime.strptime(i.date, "%Y-%m-%d").strftime("%A").lower() == day.lower():
+                booked_timings.append(i.time)
+        to_return_final = [x for x in to_return if x not in booked_timings]
+        return to_return_final
     else:
         return ["Not available"]
-
 
 @login_required
 @never_cache
@@ -455,7 +465,6 @@ def view_appointments_doctors(request, username):
         name.append(p.patient)
         date.append(p.date)
         time.append(p.time)
-        print p.date
         day.append(datetime.strptime(p.date, "%Y-%m-%d").strftime("%A"))
     content = zip(name, date, time, day)
     return render(request, "doctorvappt.html", {"content": content})
@@ -524,7 +533,7 @@ def view_time(request, username):
         for idx, i in enumerate(doctor.office_hours):
             day.append(i.day)
             time.append(i.time)
-            d[str(idx + 1) + ". " + i.day] = option_maker(str(i.time))
+            d[str(idx + 1) + ". " + i.day] = option_maker(str(i.time), username, str(i.day))
 
         full_name = str(doctor.first_name) + " " + str(doctor.last_name)
         speciality = doctor.speciality
@@ -661,5 +670,194 @@ def backend_adder(request):
 
 
 def test_page(request):
-    Doctor.objects.filter(username="dcole0", office_hours__day="Monday").update(set__office_hours__S__time="9 am to 10 am, 5 pm to 6 pm")
+    '''
+    #Doctor.objects.filter(username="dcole0", office_hours__day="Monday").update(set__office_hours__S__time="9 am to 10 am, 5 pm to 6 pm")
+    b2 = Beds.objects.create(room_type="AC Deluxe", room_number=10, bed_number=1)
+    b2.save()
+    b2 = Beds.objects.create(room_type="AC Deluxe", room_number=11, bed_number=2)
+    b2.save()
+    
     return HttpResponse("hi")
+    .update(pull__transfer_request__patient_id="mscottv")
+    
+    d = Doctor.objects.filter(transfer_request__patient_id="mscottv")
+    print d
+    for doctor in d:
+        for i in doctor.transfer_request:
+            print i.patient_name
+    
+    states = [
+    "AK",
+    "AL",
+    "AR",
+    "AZ",
+    "CA",
+    "CO",
+    "CT",
+    "DE",
+    "FL",
+    "GA",
+    "HI",
+    "IA",
+    "ID",
+    "IL",
+    "IN",
+    "KS",
+    "KY",
+    "LA",
+    "MA",
+    "MD",
+    "ME",
+    "MI",
+    "MN",
+    "MO",
+    "MS",
+    "MT",
+    "NC",
+    "ND",
+    "NE",
+    "NH",
+    "NJ",
+    "NM",
+    "NV",
+    "NY",
+    "OH",
+    "OK",
+    "OR",
+    "PA",
+    "RI",
+    "SC",
+    "SD",
+    "TN",
+    "TX",
+    "UT",
+    "VA",
+    "VT",
+    "WA",
+    "WI",
+    "WV",
+    "WY"]
+    for i in states:
+        b2 = Beds.objects.create(room_type="Transfer", location=i)
+        b2.save()
+        b3 = Beds.objects.create(room_type="Transfer", location=i)
+        b3.save()
+        b4 = Beds.objects.create(room_type="Transfer", location=i)
+        b4.save()
+    '''
+    doctor = Doctor.objects(username="dcole0").first()
+    for d in doctor.patients_admitted:
+        print d
+    return HttpResponse("Hey")
+
+@never_cache
+@login_required
+def transferpatient(request, receptionist_username, patient_username):
+    error = None
+    if Receptionist.objects(username=receptionist_username).only("username").first():
+        patient = Patient.objects(username=patient_username).only("first_name", "last_name", "email", "state").first()
+        if request.POST:
+            doctorID = request.POST.get("doctorID").strip()
+            description = request.POST.get("description").strip()
+            doctor = Doctor.objects(username=doctorID).first()
+            if Doctor.objects.filter(transfer_request__patient_id="mscottv"):
+                error = "Patient transfer request already initiated"
+            else:
+                if doctor:
+                    if doctor.state != patient.state:
+                        try:
+                            doctor.transfer_request.append(TransferRequests(patient_id=patient_username, patient_name="{} {}".format(patient.first_name, patient.last_name),
+                                                                            location=patient.state, description=description))
+                            doctor.save()
+                            return render(request, "ptransfers.html")
+                        except:
+                            error ="Something went wrong. Try again!"
+                    else:
+                        error = "No need for approvals in internal transfer."
+                else:
+                    error = "Doctor ID is not valid."
+        return render(request, "transferpatient.html", {"name": "{} {}".format(patient.first_name, patient.last_name),
+                                                        "location": patient.state, "contact": patient.state, "error": error})
+    else:
+        return redirect(login_page)
+
+@never_cache
+@login_required
+def view_transfer_consents(request, doctor_username):
+    if Doctor.objects(username=doctor_username).only("username").first():
+        name = []
+        location = []
+        description = []
+        patient_id = []
+        d = Doctor.objects.filter(username=doctor_username, transfer_request__consent=False)
+        for doctor in d:
+            for i in doctor.transfer_request:
+                name.append(i.patient_name)
+                location.append(i.location)
+                description.append(i.description)
+                patient_id.append(i.patient_id)
+        content = zip(name, location, description, patient_id)
+        return render(request, "doctorconsent.html", {"content": content})
+    else:
+        return redirect(login_page)
+
+
+@login_required
+@never_cache
+def approve_transfer_consent(request, doctor_id, patient_id):
+    doctor = Doctor.objects(username=doctor_id).only("state").first()
+    if doctor:
+        Beds.objects(room_type="Transfer", location=doctor.state). \
+            update_one(set__patient_name=patient_id)
+        Patient.objects(username=patient_id).update(set__doctor_name=doctor_id)
+        Doctor.objects(username=doctor_id).update(push__patients_admitted=patient_id)
+        Doctor.objects.filter(transfer_request__patient_id=patient_id).update(pull__transfer_request__patient_id=patient_id)
+        Beds.objects(patient_name=patient_id). \
+            update_one(set__patient_name=None)
+        return render(request, "transferaccept.html")
+    else:
+        return redirect(login_page)
+
+
+@login_required
+@never_cache
+def reject_transfer_consent(request, doctor_id, patient_id):
+    doctor = Doctor.objects(username=doctor_id).only("state").first()
+    if doctor:
+        Doctor.objects.filter(transfer_request__patient_id=patient_id).update(pull__transfer_request__patient_id=patient_id)
+        return render(request, "transferreject.html")
+    else:
+        return redirect(login_page)
+
+
+def validate_doctor(request):
+    if request.POST:
+        to_return = ""
+        text = request.POST.get("doctorID")
+        text1 = request.POST.get("doctorName")
+        if len(text) > 4:
+            doctor = Doctor.objects(username=text).only("first_name", "last_name", "speciality", "state").first()
+            if doctor:
+                to_return = "{} {} is {} in {}.".format(doctor.first_name, doctor.last_name,
+                                                               doctor.speciality, doctor.state)
+                return HttpResponse(to_return)
+        elif len(text1) > 4:
+            t = text1.split()
+            if len(t) > 1:
+                first_name = t[0]
+                last_name = t[1]
+                d = Doctor.objects(first_name=first_name, last_name=last_name).only("username", "speciality", "state")
+                if d:
+                    for doctor in d:
+                        to_return += "DoctorID is {} for {} {} who is {} in {}.\n".format(doctor.username, first_name,
+                                                                                      last_name, doctor.speciality, doctor.state)
+                    return HttpResponse(to_return)
+            else:
+                d = Doctor.objects(first_name=text1).only("username", "speciality", "state", "first_name", "last_name")
+                if d:
+                    for doctor in d:
+                        to_return += "DoctorID is {} for {} {} who is {} in {}.\n".format(doctor.username, doctor.first_name,
+                                                                                          doctor.last_name, doctor.speciality,
+                                                                                          doctor.state)
+                    return HttpResponse(to_return)
+        return HttpResponse("No doctor found.")
