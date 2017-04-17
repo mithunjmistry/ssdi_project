@@ -76,7 +76,6 @@ class Beds(Document):
     bed_number = IntField(required=True)
     patient_name = StringField(default=None)
 
-
 class Other_Charges(EmbeddedDocument):
     charge_Description = StringField(required=True)
     charge_Value = FloatField(required=True)
