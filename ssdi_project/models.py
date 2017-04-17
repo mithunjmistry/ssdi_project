@@ -18,6 +18,12 @@ class Appointments(EmbeddedDocument):
     date = StringField()
     time = StringField()
 
+class Bill(Document):
+    patient_Id = StringField(required=True)
+    doctor_Id = StringField(required=True)
+    doctor_Fees = StringField(required=True)
+    Other_Charges=DictField(default=None)
+
 class PatientPaymentHistory(EmbeddedDocument):
     date = StringField()
     state = StringField()
