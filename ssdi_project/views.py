@@ -10,6 +10,7 @@ from django.core.mail import send_mail
 from datetime import datetime, timedelta
 from collections import OrderedDict, deque
 import calendar
+import time
 
 
 def get_boolean(value):
@@ -110,29 +111,63 @@ class Bedsh():
     bed_number = IntField(required=True)
     patient_name = StringField(default=None)
 
+
+@login_required
+@never_cache
+def generate_bill(request, username):
+    if FactoryUserStatus(username) == "receptionist":
+        t = Receptionist.objects(username=username).only('state').first()
+        if 'Update' in request.POST:
+            tcharge=request.POST.get("tcharges")
+            print request
+    else:
+        return redirect(login_page)
+    full_name = []
+    doctor_name = []
+    patient_id = []
+    for patient in Patient.objects.only('first_name', 'last_name', 'doctor_name', 'username', 'currently_admitted'):
+        if(patient.currently_admitted):
+            full_name.append(str(patient.first_name + " " + patient.last_name))
+            doctor_name.append(str(patient.doctor_name))
+            patient_id.append(str(patient.username))
+    content = zip(full_name, doctor_name, patient_id)
+    return render(request, "dischargepatient.html",
+                  {"content": content})
+
+
 @login_required
 @never_cache
 def discharge_patient(request, username):
     if FactoryUserStatus(username) == "receptionist":
         t = Receptionist.objects(username=username).only('state').first()
-        if request.POST.get("patientID") != None:
-            patientID = str(request.POST.get("patientID")).strip()
-            doctorName = str(request.POST.get("doctorName"))
-            for b in Beds.objects():
-                if (b.patient_name == patientID):
-                    room_t = str(b.room_type)
-                    room_no = int(b.room_number)
-                    bed_no = int(b.bed_number)
-                    loc = str(b.location)
-                    break
-            Patient.objects(username=patientID).update_one(set__currently_admitted=False)
-            Patient.objects(username=patientID).update_one(set__doctor_name=None)
-            Doctor.objects(username=patientID).update_one(pull__patients_admitted='')
-            Beds.objects(room_type=room_t, room_number=room_no, bed_number=bed_no, location=loc). \
-                update_one(set__patient_name=None)
-                    #return HttpResponse("Removed by backend.")
     else:
         return redirect(login_page)
+    if request.POST.get("patientID")!=None:
+        patientID = str(request.POST.get("patientID")).strip()
+        doctorName = str(request.POST.get("doctorName"))
+        for b in Beds.objects():
+            if (b.patient_name == patientID):
+                room_t = str(b.room_type)
+                room_no = int(b.room_number)
+                bed_no = int(b.bed_number)
+                loc = str(b.location)
+                break
+        Patient.objects(username=patientID).update_one(set__currently_admitted=False)
+        Patient.objects(username=patientID).update_one(set__doctor_name=None)
+        Doctor.objects(username=patientID).update_one(pull__patients_admitted='')
+        Beds.objects(room_type=room_t, room_number=room_no, bed_number=bed_no, location=loc).update_one(
+            set__patient_name=None)
+        patient = Patient.objects(username=patientID).only('first_name', 'last_name', 'email', 'address').first()
+        charge = 0.0;
+        for bill in Bill.objects:
+            if (bill.patient_Id == patientID):
+                charge = charge + float(bill.doctor_Fees)
+                for x in bill.Other_Charges.items():
+                    charge = charge + float(x[1])
+                return render(request, "generateBill.html",
+                              {"charges": charge, "content": bill, "date": str(time.strftime("%c")),
+                               "name": str(patient.first_name) + " " + str(patient.last_name),
+                               "email": str(patient.email), "address": str(patient.address), "user":username})
     full_name = []
     doctor_name = []
     patient_id = []
@@ -610,11 +645,18 @@ def test_database(request):
 
 
 def backend_adder(request):
-    Beds.objects(room_type='General', room_number=1, bed_number=1, location='NC'). \
+    Beds.objects(room_type='General', room_number=5, bed_number=10, location='NC'). \
         update_one(set__patient_name=None)
     Patient.objects(username='').update_one(set__currently_admitted=False)
     Patient.objects(username='').update_one(set__doctor_name=None)
     Doctor.objects(username='').update_one(pull__patients_admitted='')
+    i=14
+    for patients in Patient.objects:
+        i = i + 1;
+        #print(patients.currently_admitted)
+        #Beds.objects.create(room_type='AC Deluxe', room_number=i, bed_number=1, location='NC', patient_name=patients.username)
+        #Bill.objects.create(patient_Id=patients.username ,doctor_Id="dcole0",doctor_Fees="100.0",Other_Charges={"room charges":500, "food":200})
+    print(i)
     return HttpResponse("Added by backend.")
 
 
