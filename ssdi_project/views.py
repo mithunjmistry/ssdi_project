@@ -121,21 +121,44 @@ def generate_bill(request, username):
     if FactoryUserStatus(username) == "receptionist":
         t = Receptionist.objects(username=username).only('state').first()
         if 'Update' in request.POST:
-            tcharge=request.POST.get("tcharges")
-            print request
+            tcharge=request.POST.get('tcharges1')
+            print tcharge
+            patientID=request.POST.get("patientID1")
+            print patientID
+            cdesc=request.POST.get("description11")
+            print request.POST
+            patient = Patient.objects(username=patientID).only('first_name', 'last_name', 'email', 'address').first()
+            charge = float(tcharge);
+            for bill in Bill.objects:
+                if (bill.patient_Id == patientID):
+                    for x in bill.Extra_Charges:
+                        charge = charge + float(x.charge_Value)
+                    bill.Extra_Charges.append(Other_Charges(charge_Description=str(cdesc), charge_Value=float(tcharge)))
+                    bill.save()
+                    return render(request, "generateBill.html",
+                                  {"charges": charge, "content": bill, "date": str(time.strftime("%c")),
+                                   "name": str(patient.first_name) + " " + str(patient.last_name),
+                                   "email": str(patient.email), "address": str(patient.address), "user": username, "patient":str(patientID)})
+        if 'Generate_Bill' in request.POST:
+            tcharge = request.POST.get('tcharges2')
+            print tcharge
+            patientID = request.POST.get("patientID2")
+            print patientID
+            cdesc = request.POST.get("description12")
+            print request.POST
+            patient = Patient.objects(username=patientID).only('first_name', 'last_name', 'email', 'address').first()
+            charge = float(tcharge);
+            for bill in Bill.objects:
+                if (bill.patient_Id == patientID):
+                    for x in bill.Extra_Charges:
+                        charge = charge + float(x.charge_Value)
+                    bill.Extra_Charges.append(Other_Charges(charge_Description=str(cdesc), charge_Value=float(tcharge)))
+                    bill.save()
+                    return render(request, "receptionist.html")
+
     else:
         return redirect(login_page)
-    full_name = []
-    doctor_name = []
-    patient_id = []
-    for patient in Patient.objects.only('first_name', 'last_name', 'doctor_name', 'username', 'currently_admitted'):
-        if(patient.currently_admitted):
-            full_name.append(str(patient.first_name + " " + patient.last_name))
-            doctor_name.append(str(patient.doctor_name))
-            patient_id.append(str(patient.username))
-    content = zip(full_name, doctor_name, patient_id)
-    return render(request, "dischargepatient.html",
-                  {"content": content})
+
 
 
 @login_required
@@ -143,38 +166,40 @@ def generate_bill(request, username):
 def discharge_patient(request, username):
     if FactoryUserStatus(username) == "receptionist":
         t = Receptionist.objects(username=username).only('state').first()
+        if request.POST.get("patientID") != None:
+            patientID = str(request.POST.get("patientID")).strip()
+            doctorName = str(request.POST.get("doctorName"))
+            for b in Beds.objects():
+                if (b.patient_name == patientID):
+                    room_t = str(b.room_type)
+                    room_no = int(b.room_number)
+                    bed_no = int(b.bed_number)
+                    loc = str(b.location)
+                    break
+            Patient.objects(username=patientID).update_one(set__currently_admitted=False)
+            Patient.objects(username=patientID).update_one(set__doctor_name=None)
+            Doctor.objects(username=patientID).update_one(pull__patients_admitted='')
+            Beds.objects(room_type=room_t, room_number=room_no, bed_number=bed_no, location=loc). \
+                update_one(set__patient_name=None)
+
+            patient = Patient.objects(username=patientID).only('first_name', 'last_name', 'email', 'address').first()
+            charge = 0.0;
+            for bill in Bill.objects:
+                if (bill.patient_Id == patientID):
+                    charge = charge + float(bill.doctor_Fees)
+                    for x in bill.Extra_Charges:
+                        charge = charge + float(x.charge_Value)
+                    return render(request, "generateBill.html",
+                                  {"charges": charge, "content": bill, "date": str(time.strftime("%c")),
+                                   "name": str(patient.first_name) + " " + str(patient.last_name),
+                                   "email": str(patient.email), "address": str(patient.address), "user": username, "patient":str(patientID)})
+                    #return HttpResponse("Removed by backend.")
     else:
         return redirect(login_page)
-    if request.POST.get("patientID")!=None:
-        patientID = str(request.POST.get("patientID")).strip()
-        doctorName = str(request.POST.get("doctorName"))
-        for b in Beds.objects():
-            if (b.patient_name == patientID):
-                room_t = str(b.room_type)
-                room_no = int(b.room_number)
-                bed_no = int(b.bed_number)
-                loc = str(b.location)
-                break
-        Patient.objects(username=patientID).update_one(set__currently_admitted=False)
-        Patient.objects(username=patientID).update_one(set__doctor_name=None)
-        Doctor.objects(username=patientID).update_one(pull__patients_admitted='')
-        Beds.objects(room_type=room_t, room_number=room_no, bed_number=bed_no, location=loc).update_one(
-            set__patient_name=None)
-        patient = Patient.objects(username=patientID).only('first_name', 'last_name', 'email', 'address').first()
-        charge = 0.0;
-        for bill in Bill.objects:
-            if (bill.patient_Id == patientID):
-                charge = charge + float(bill.doctor_Fees)
-                for x in bill.Other_Charges.items():
-                    charge = charge + float(x[1])
-                return render(request, "generateBill.html",
-                              {"charges": charge, "content": bill, "date": str(time.strftime("%c")),
-                               "name": str(patient.first_name) + " " + str(patient.last_name),
-                               "email": str(patient.email), "address": str(patient.address), "user":username})
     full_name = []
     doctor_name = []
     patient_id = []
-    for patient in Patient.objects.only('first_name', 'last_name', 'doctor_name', 'username', 'currently_admitted'):
+    for patient in Patient.objects(state=t.state).only('first_name', 'last_name', 'doctor_name', 'username', 'currently_admitted'):
         if(patient.currently_admitted):
             full_name.append(str(patient.first_name + " " + patient.last_name))
             doctor_name.append(str(patient.doctor_name))
@@ -189,23 +214,43 @@ def discharge_patient(request, username):
 def admit_patient(request, username):
 
     if FactoryUserStatus(username) == "receptionist":
-        cnt = 0
         t = Receptionist.objects(username=username).only('state').first()
         if request.POST.get("patientID")!=None:
             patientID = str(request.POST.get("patientID")).strip()
             doctorName = str(request.POST.get("doctorName"))
-            if (Patient.objects(username=patientID).first()) is not None \
-                    and (Doctor.objects(username=doctorName).first()) is not None:
-                room_no = int(request.POST.get("room"))
-                room_type = str(request.POST.get("roomtype")).strip()
-                bed = int(request.POST.get("bed"))
-                Beds.objects(room_type=room_type,room_number=room_no,bed_number=bed,location=t.state).\
-                    update_one(set__patient_name=patientID)
-                Patient.objects(username=patientID).update(set__currently_admitted=True)
-                Patient.objects(username=patientID).update(set__doctor_name=doctorName.strip())
-                Doctor.objects(username=doctorName).update(push__patients_admitted=patientID)
-                cnt = 1
-                # enter into the db
+            doc = Doctor.objects(username=doctorName).only('state').first()
+            if (Patient.objects(username=patientID).first()) is not None:
+                if (Doctor.objects(username=doctorName)) is not None:
+                    if doc.state == t.state:
+                        room_no = int(request.POST.get("room"))
+                        room_type = str(request.POST.get("roomtype")).strip()
+                        bed = int(request.POST.get("bed"))
+                        Beds.objects(room_type=room_type,room_number=room_no,bed_number=bed,location=t.state).\
+                            update_one(set__patient_name=patientID)
+                        Patient.objects(username=patientID).update(set__currently_admitted=True)
+                        Patient.objects(username=patientID).update(set__doctor_name=doctorName.strip())
+                        Doctor.objects(username=doctorName).update(push__patients_admitted=patientID)
+                        Bill.objects.create(patient_Id=patientID, doctor_Id=doctorName,
+                                            doctor_Fees=str(doc.consulting_fees),Extra_Charges=[Other_Charges(charge_Description="ICU Charges", charge_Value=200.5)])
+                        b = Beds.objects(location=t.state).exclude('location')
+                        d = []
+                        for i in b:
+                            if i.patient_name == None:
+                                bed = Bedsh()
+                                bed = i
+                                d.append(bed)
+                        return render(request, "admitpatient.html",{'message':'Patient Admitted successfully','d': d})
+                    else:
+                        return render(request, "admitpatient.html", {'error': "Doctor's not in your location"})
+                else:
+                    b = Beds.objects(location=t.state).exclude('location')
+                    d = []
+                    for i in b:
+                        if i.patient_name == None:
+                            bed = Bedsh()
+                            bed = i
+                            d.append(bed)
+                    return render(request, "admitpatient.html", {'error': "DoctorId incorrect!", 'd': d})
             else:
                 b = Beds.objects(location=t.state).exclude('location')
                 d = []
@@ -214,25 +259,19 @@ def admit_patient(request, username):
                         bed = Bedsh()
                         bed = i
                         d.append(bed)
-                if patientID == None:
-                    return render(request,"admitpatient.html", {'error': "PatientID incorrect!",'d':d})
-                else:
-                    return render(request, "admitpatient.html", {'error': "Doctor incorrect!", 'd': d})
-        b = Beds.objects(location=t.state).exclude('location')
-        d = []
-        for i in b:
-            if i.patient_name == None:
-                bed = i
-                d.append(bed)
-            else:
-                print i.patient_name
-        if cnt == 1:
-            return render(request, "admitpatient.html", {'d': d, 'message':'Patient admitted'})
+                return render(request,"admitpatient.html", {'error': "PatientID incorrect!",'d':d})
         else:
-            return render(request, "admitpatient.html", {'d': d})
+            b = Beds.objects(location=t.state).exclude('location')
+            d = []
+            for i in b:
+                if i.patient_name == None:
+                    bed = i
+                    d.append(bed)
+                else:
+                    pass
+            return render(request, "admitpatient.html",{'d': d})
     else:
         return redirect(login_page)
-
 
 @login_required
 @never_cache
@@ -659,9 +698,16 @@ def backend_adder(request):
     Patient.objects(username='').update_one(set__currently_admitted=False)
     Patient.objects(username='').update_one(set__doctor_name=None)
     Doctor.objects(username='').update_one(pull__patients_admitted='')
-    i=14
+    i=55
     for patients in Patient.objects:
         i = i + 1;
+        if (patients.state=="NC"):
+            patients.update(set__currently_admitted=True)
+            Bill.objects.create(patient_Id=patients.username, doctor_Id="dcole0",
+                                doctor_Fees="50",
+                                Extra_Charges=[Other_Charges(charge_Description="ICU Charges", charge_Value=200.5)])
+            Beds.objects.create(room_type='AC Deluxe', room_number=i, bed_number=1, location='NC',
+                                patient_name=patients.username)
         #print(patients.currently_admitted)
         #Beds.objects.create(room_type='AC Deluxe', room_number=i, bed_number=1, location='NC', patient_name=patients.username)
         #Bill.objects.create(patient_Id=patients.username ,doctor_Id="dcole0",doctor_Fees="100.0",Other_Charges={"room charges":500, "food":200})

@@ -18,11 +18,15 @@ class Appointments(EmbeddedDocument):
     date = StringField()
     time = StringField()
 
+class Other_Charges(EmbeddedDocument):
+    charge_Description = StringField(required=True)
+    charge_Value = FloatField(required=True)
+
 class Bill(Document):
-    patient_Id = StringField(required=True)
+    patient_Id = StringField(required=True,primary_key=True)
     doctor_Id = StringField(required=True)
-    doctor_Fees = StringField(required=True)
-    Other_Charges=DictField(default=None)
+    doctor_Fees = FloatField(required=True)
+    Extra_Charges=ListField(EmbeddedDocumentField(Other_Charges))
 
 class PatientPaymentHistory(EmbeddedDocument):
     date = StringField()

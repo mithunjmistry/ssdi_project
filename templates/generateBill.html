@@ -123,9 +123,9 @@
                     <table>
                         <tr>
                             <td>
-                                Next Step Webs, Inc.<br>
-                                12345 Sunny Road<br>
-                                Sunnyville, TX 12345
+                                UNCC <br>
+                                9201 University City Blvd,<br>
+                                Charlotte, NC 28223
                             </td>
 
                             <td>
@@ -160,14 +160,14 @@
                 </td>
             </tr>
 
-            {% for key,value in content.Other_Charges.items %}
+            {% for x in content.Extra_Charges %}
                 <tr class="item">
                 <td>
-                    {{ key }}
+                    {{ x.charge_Description }}
                 </td>
 
                 <td>
-                    {{ value }}
+                    {{ x.charge_Value }}
                 </td>
                 </tr>
             {% endfor %}
@@ -178,7 +178,7 @@
                 </td>
 
                 <td>
-                    <input type="text" name="charge" class="form-control"  id="charge" value="0.0" >
+                    <input type="text" name="charge" class="form-control"  id="charge" value="0.0" disabled>
                 </td>
             </tr>
 
@@ -206,9 +206,9 @@
     {% csrf_token %}
     <label for="submit"></label>
     <input type="submit"  class="btn btn-success" name="Update"  id="Update"  value="Update" />
-    <input type="hidden" name="patientID" class="form-control"  id="patientID" value="" >
-    <input type="hidden" name="description1" class="form-control"  id="description1" value="">
-    <input type="hidden" name="tcharges" class="form-control"  id="tcharges" value="room">
+    <input type="hidden" name="patientID1" class="form-control"  id="patientID1" value="{{ patient }}" >
+    <input type="hidden" name="description11" class="form-control"  id="description11" value="">
+    <input type="hidden" name="tcharges1" class="form-control"  id="tcharges1" value=0.0>
 <form/>
 
 
@@ -217,29 +217,21 @@
 
     <label for="submit"></label>
     <input type="submit"  class="btn btn-success" name="Generate_Bill"  id="Generate_Bill"  value="Generate_Bill" />
-    <input type="hidden" name="patientID" class="form-control"  id="patientID" value="" >
-    <input type="hidden" name="description1" class="form-control"  id="description1" value="">
-    <input type="hidden" name="tcharges" class="form-control"  id="bed" value="tcharges">
+    <input type="hidden" name="patientID2" class="form-control"  id="patientID2" value="{{ patient }}" >
+    <input type="hidden" name="description12" class="form-control"  id="description12" value="">
+    <input type="hidden" name="tcharges2" class="form-control"  id="tcharges2" value=0.0>
 <form/>
 
 <script type="application/javascript">
 
 $("#charge").change(function() {
-    alert("Change detected!");
-    $('#tcharges').val(parseInt($('#charge').val())+parseInt({{ charges }}))
-    alert($('#tcharges').val())
-    tcharge=parseInt($('#tcharges').val())
-    alert(tcharge)
-    $("#total").hide()
-    $("#desc").hide()
-    $('#Table tr:last').after('<tr class="total" id="total"><td></td><td id="total_charges">Total: {{  tcharge }}<td></tr>')
-
+    $('#tcharges1').val(parseFloat($('#charge').val()))
+    $('#tcharges2').val(parseFloat($('#charge').val()))
 });
 $("#description").change(function() {
-    alert("Change detected!");
-     $('#description1').val(    $('#description').val()   )
-    alert($('#description1').attr('value'));
-
+    $('#charge').prop('disabled',false);
+    $('#description11').val($('#description').val())
+    $('#description12').val($('#description').val())
 });
 
 $(document).ready(function() {
