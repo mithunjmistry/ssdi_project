@@ -124,8 +124,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 #SESSION_ENGINE = 'mongoengine.django.sessions'
 
-#mongoengine.connect("ssdidatabase", host="mongodb://mithunjmistry:1234567890@ds147070.mlab.com:47070/ssdidatabase")
-mongoengine.connect("ssditestdatabase", host="mongodb://mithunjmistry:1234567890@ds147480.mlab.com:47480/ssditestdatabase")
+mongoengine.connect("ssdidatabase", host="mongodb://mithunjmistry:1234567890@ds147070.mlab.com:47070/ssdidatabase")
+#mongoengine.connect("ssditestdatabase", host="mongodb://mithunjmistry:1234567890@ds147480.mlab.com:47480/ssditestdatabase")
 
 from ssdi_project.views import login_page
 LOGIN_URL = login_page

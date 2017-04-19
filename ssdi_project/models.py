@@ -21,12 +21,28 @@ class Appointments(EmbeddedDocument):
 class Other_Charges(EmbeddedDocument):
     charge_Description = StringField(required=True)
     charge_Value = FloatField(required=True)
+    doctor=BooleanField(required=True)
 
 class Bill(Document):
     patient_Id = StringField(required=True,primary_key=True)
     doctor_Id = StringField(required=True)
     doctor_Fees = FloatField(required=True)
     Extra_Charges=ListField(EmbeddedDocumentField(Other_Charges))
+    date=StringField(default="")
+    adate=StringField(required=True)
+
+class Bills(EmbeddedDocument):
+    patient_Id = StringField(required=True,primary_key=True)
+    doctor_Id = StringField(required=True)
+    doctor_Fees = FloatField(required=True)
+    Extra_Charges=ListField(EmbeddedDocumentField(Other_Charges))
+    date=StringField(default="")
+    adate=StringField(required=True)
+    total=FloatField()
+
+class prev_rec(Document):
+    patient_Id = StringField(required=True, primary_key=True)
+    records=ListField(EmbeddedDocumentField(Bills))
 
 class PatientPaymentHistory(EmbeddedDocument):
     date = StringField()

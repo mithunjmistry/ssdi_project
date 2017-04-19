@@ -111,7 +111,8 @@
                             </td>
 
                             <td >
-                                Created: {{ date }}<br>
+                                Admitted: {{ content.adate }}<br>
+                                Discharged: {{ content.date }}<br>
                             </td>
                         </tr>
                     </table>
@@ -205,7 +206,7 @@
 <form action="\generateBill\{{ user }}\" method="post">
     {% csrf_token %}
     <label for="submit"></label>
-    <input type="submit"  class="btn btn-success" name="Update"  id="Update"  value="Update" />
+    <input type="submit"  class="btn btn-success" name="Update"  id="Update"  value="Update"/>
     <input type="hidden" name="patientID1" class="form-control"  id="patientID1" value="{{ patient }}" >
     <input type="hidden" name="description11" class="form-control"  id="description11" value="">
     <input type="hidden" name="tcharges1" class="form-control"  id="tcharges1" value=0.0>
@@ -214,7 +215,6 @@
 
 <form  action="\generateBill\{{ user }}\" method="post">
     {% csrf_token %}
-
     <label for="submit"></label>
     <input type="submit"  class="btn btn-success" name="Generate_Bill"  id="Generate_Bill"  value="Generate_Bill" />
     <input type="hidden" name="patientID2" class="form-control"  id="patientID2" value="{{ patient }}" >
@@ -224,9 +224,11 @@
 
 <script type="application/javascript">
 
+
 $("#charge").change(function() {
     $('#tcharges1').val(parseFloat($('#charge').val()))
     $('#tcharges2').val(parseFloat($('#charge').val()))
+
 });
 $("#description").change(function() {
     $('#charge').prop('disabled',false);
@@ -235,6 +237,7 @@ $("#description").change(function() {
 });
 
 $(document).ready(function() {
+
   $(".search").keyup(function () {
     var searchTerm = $(".search").val();
     var listItem = $('.results tbody').children('tr');

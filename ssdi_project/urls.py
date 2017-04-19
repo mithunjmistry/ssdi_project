@@ -39,6 +39,7 @@ urlpatterns = [
     url(r'^viewtimings/(\w+)/', view_time, name="SpecificDoctorTime"),
     url(r'^book/(\w+)/', book_appointment, name="BookAppointment"),
     url(r'^viewappointments/patient/(\w+)/', view_appointments_patients, name="ViewAppointmentPatient"),
+    url(r'^viewbills/patient/(\w+)/', view_bills_patients, name="ViewAppointmentPatient"),
     url(r'^viewappointments/doctor/(\w+)/', view_appointments_doctors, name="ViewAppointmentPatient"),
     url(r'^deleteuser/(\w+)/', delete_user, name="ViewAppointmentPatient"),
     url(r'^testurl/', test_page, name="TestPage"),

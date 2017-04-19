@@ -127,15 +127,20 @@ def generate_bill(request, username):
             print patientID
             cdesc=request.POST.get("description11")
             print request.POST
+            if(prev_rec.objects(patient_Id=patientID).first()==None):
+                prev_rec.objects.create(patient_Id=patientID)
             patient = Patient.objects(username=patientID).only('first_name', 'last_name', 'email', 'address').first()
             charge = float(tcharge);
             for bill in Bill.objects:
                 if (bill.patient_Id == patientID):
                     for x in bill.Extra_Charges:
                         charge = charge + float(x.charge_Value)
-                    bill.Extra_Charges.append(Other_Charges(charge_Description=str(cdesc), charge_Value=float(tcharge)))
-                    bill.save()
-                    return render(request, "generateBill.html",
+                    if (float(tcharge) > float(0)):
+                        bill.Extra_Charges.append(
+                            Other_Charges(charge_Description=str(cdesc), charge_Value=float(tcharge), doctor=0))
+                        bill.date = str(time.strftime("%c"))
+                        bill.save()
+                return render(request, "generateBill.html",
                                   {"charges": charge, "content": bill, "date": str(time.strftime("%c")),
                                    "name": str(patient.first_name) + " " + str(patient.last_name),
                                    "email": str(patient.email), "address": str(patient.address), "user": username, "patient":str(patientID)})
@@ -146,14 +151,24 @@ def generate_bill(request, username):
             print patientID
             cdesc = request.POST.get("description12")
             print request.POST
+            if (prev_rec.objects(patient_Id=patientID).first() == None):
+                prev_rec.objects.create(patient_Id=patientID)
             patient = Patient.objects(username=patientID).only('first_name', 'last_name', 'email', 'address').first()
             charge = float(tcharge);
             for bill in Bill.objects:
                 if (bill.patient_Id == patientID):
                     for x in bill.Extra_Charges:
                         charge = charge + float(x.charge_Value)
-                    bill.Extra_Charges.append(Other_Charges(charge_Description=str(cdesc), charge_Value=float(tcharge)))
+                    if(float(tcharge)>float(0)):
+                        bill.Extra_Charges.append(Other_Charges(charge_Description=str(cdesc), charge_Value=float(tcharge), doctor=0))
+                    bill.date=str(time.strftime("%c"))
                     bill.save()
+                    newbill=prev_rec.objects(patient_Id=patientID).first()
+                    newbill.records.append(Bills(patient_Id = bill.patient_Id, doctor_Id = bill.doctor_Id,
+                                                 doctor_Fees = bill.doctor_Fees,
+                                                 Extra_Charges=bill.Extra_Charges,
+                                                 date=bill.date,   adate=bill.adate ))
+                    newbill.save()
                     return render(request, "receptionist.html")
 
     else:
@@ -230,8 +245,8 @@ def admit_patient(request, username):
                         Patient.objects(username=patientID).update(set__currently_admitted=True)
                         Patient.objects(username=patientID).update(set__doctor_name=doctorName.strip())
                         Doctor.objects(username=doctorName).update(push__patients_admitted=patientID)
-                        Bill.objects.create(patient_Id=patientID, doctor_Id=doctorName,
-                                            doctor_Fees=str(doc.consulting_fees),Extra_Charges=[Other_Charges(charge_Description="ICU Charges", charge_Value=200.5)])
+                        Bill.objects.create(patient_Id=patientID, doctor_Id=doctorName, adate=str(time.strftime("%c")),
+                                            doctor_Fees=str(doc.consulting_fees),Extra_Charges=[Other_Charges(charge_Description="ICU Charges", charge_Value=200.5, doctor=0)])
                         b = Beds.objects(location=t.state).exclude('location')
                         d = []
                         for i in b:
@@ -528,6 +543,24 @@ def view_appointments_patients(request, username):
     content = zip(name, date, time, day, state)
     return render(request, "patientvappt.html", {"content": content})
 
+@login_required
+@never_cache
+def view_bills_patients(request, username):
+    patient = Patient.objects(username=str(request.user.get_username()).strip()).first()
+    #prev_recs=prev_rec.objects(patient_Id=str(request.user.get_username()).strip()).first()
+    charge=0.0
+    for prev_recs in prev_rec.objects:
+        if (prev_recs.patient_Id == patient.username):
+            for x in prev_recs.records:
+                charge = charge + float(x.doctor_Fees)
+                for y in x.Extra_Charges:
+                    charge = charge + float(y.charge_Value)
+                print charge
+                x.total=charge
+                prev_recs.save()
+                charge=0.0
+    return render(request, "patientvprecs.html", {"content": prev_recs.records, "name": str(patient.first_name) + " " + str(patient.last_name),
+                                                  "email": str(patient.email), "address": str(patient.address),"patient": str(request.user.get_username())})
 
 @never_cache
 def book_appointment(request, username):
@@ -704,8 +737,9 @@ def backend_adder(request):
         if (patients.state=="NC"):
             patients.update(set__currently_admitted=True)
             Bill.objects.create(patient_Id=patients.username, doctor_Id="dcole0",
-                                doctor_Fees="50",
-                                Extra_Charges=[Other_Charges(charge_Description="ICU Charges", charge_Value=200.5)])
+                                doctor_Fees="50", adate=str(time.strftime("%c")),
+                                Extra_Charges=[Other_Charges(charge_Description="ICU Charges", charge_Value=200.5, doctor=0)])
+            prev_rec.objects.create(patient_Id=patients.username)
             Beds.objects.create(room_type='AC Deluxe', room_number=i, bed_number=1, location='NC',
                                 patient_name=patients.username)
         #print(patients.currently_admitted)
