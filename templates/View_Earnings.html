@@ -16,16 +16,5 @@
 {% block message %}<p> {{ message }} </p> {% endblock %}
 
 {% block side_options_messages %}
-<div class="tab-pane" id="tab_b">
-             <h4>View my Appointments</h4>
-            <p>Here we will show his appointments.</p>
-        </div>
-        <div class="tab-pane" id="tab_c">
-             <h4>Set Office hours</h4>
-            <p>Here we will show his prescriptions.</p>
-        </div>
-        <div class="tab-pane" id="tab_f">
-             <h4>Set Consultation fees</h4>
-            <p>Here we will show his previous bills.</p>
-        </div>
+{{ final_earnings }}
 {% endblock %}

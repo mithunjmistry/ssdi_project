@@ -43,6 +43,7 @@ urlpatterns = [
     url(r'^testurl/', test_page, name="TestPage"),
     url(r'^validatedoctor/', validate_doctor, name="ValidateDoctor"),
     url(r'^admittedPatients/doctor/(\w+)/', view_Patients, name="ViewPatients"),
+    url(r'^viewEarnings/doctor/(\w+)/', view_MonthlyEarnings, name="view_MonthlyEarnings"),
     url(r'^transfer/(\w+)/(\w+)/', transferpatient, name="TransferPatient"),
 ]
 

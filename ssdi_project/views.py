@@ -171,8 +171,9 @@ def admit_patient(request, username):
                         Patient.objects(username=patientID).update(set__currently_admitted=True)
                         Patient.objects(username=patientID).update(set__doctor_name=doctorName.strip())
                         Doctor.objects(username=doctorName).update(push__patients_admitted=patientID)
-                        Bill.objects.create(patient_Id=patientID, doctor_Id=doctorName,
-                                            doctor_Fees=str(doc.consulting_fees),Extra_Charges=[Other_Charges(charge_Description="ICU Charges", charge_Value=200.5)])
+                        Bill.objects.create(patient_Id=patientID,
+                                            doctor_Id=doctorName,dateOfAdmission=str(datetime.now()),
+                                            doctor_Fees=str(doc.consulting_fees))
                         b = Beds.objects(location=t.state).exclude('location')
                         d = []
                         for i in b:
@@ -633,34 +634,18 @@ def test_database(request):
 
 
 def backend_adder(request):
-    #other = Others()
-    others =[]
-    other = Other_Charges()
-    other.charge_Description = "Food"
-    other.charge_Value=200.5
-    others.append(other)
-    #b= Bill.objects.filter(patient_Id="Shalaka").\
-     #   update_one(set__Extra_Charges__S__charge_Description="F..")
-    #b = Bill.objects.filter(patient_Id="Mithun"). \
-    #    update_one(set__Extra_Charges__S__charge_Value=100.8)
+    date = datetime.now()
+    consultation_earnings = 0
+    doc = Doctor.objects(username="rcoleman1g").first()
+    print doc
+    fees = doc.consulting_fees
+    print fees
+    appointments = doc.doctor_appointments
+    for appointment in appointments:
+        if str(appointment.date).split('-')[1].strip() == str(date).split('-')[1].strip():
+            consultation_earnings = consultation_earnings + fees
+    print consultation_earnings
 
-    #bill = Bill.objects.create(patient_Id="Shalaka", doctor_Id="dcole0", doctor_Fees="600",
-    #                         Extra_Charges=[Other_Charges(charge_Description="ICU Charges", charge_Value=200.5)])
-
-    # Use below for editing charges..
-    #bill = Bill.objects(patient_Id='Shalaka').first()
-    #bill.Extra_Charges.append(Other_Charges(charge_Description='Food',charge_Value=302.5))
-    #bill.save()
-    '''b2 = Beds.objects.create(room_type="AC Deluxe", room_number=10, bed_number=1,location='TX')
-    b2.save()
-    b2 = Beds.objects.create(room_type="AC Deluxe", room_number=11, bed_number=2,location='TX')
-    b2.save()'''
-    user = User.objects.create_user(username="dcole0", email="mithunjmistry@gmail.com", password="1234567890")
-    user.save()
-    tr = TypeOfUser.objects.create(username="dcole0", user_status="doctor")
-    tr.save()
-
-    return HttpResponse("Added by backend.")
 
 
 def test_page(request):
@@ -736,24 +721,57 @@ def validate_doctor(request):
                     return HttpResponse(to_return)
         return HttpResponse("No doctor found.")
 
-
 class patient():
     patientId = StringField()
     first_name = StringField()
     last_name=StringField()
 
 def view_Patients(request,username):
-    if request.POST:
-        bill = Bill.objects(patient_Id=str(request.POST.get()))
     patientsList = []
     patients = Doctor.objects(username=username).first()
-    for i in range(0,len(patients.patients_admitted)):
-        print patients.patients_admitted[i]
-        name = Patient.objects(username=patients.patients_admitted[i]).\
-            only('first_name','last_name').first()
+    for i in range(0, len(patients.patients_admitted)):
+        name = Patient.objects(username=patients.patients_admitted[i]). \
+            only('first_name', 'last_name').first()
         p = patient()
         p.first_name = name.first_name
         p.last_name = name.last_name
         p.patientId = patients.patients_admitted[i]
-        patientsList.append(name)
+        patientsList.append(p)
+    if request.POST:
+        doc = Doctor.objects(username=username).first()
+        for i in range(1, len(patients.patients_admitted)+1):
+            description = str(request.POST.get("Description"+str(i)))
+            Charges = str(request.POST.get("Charges"+str(i))).strip()
+            patientID = str(request.POST.get("patient"+str(i))).strip()
+            if(float(Charges)>0.0):
+                bill = Bill.objects(patient_Id=patientID).first()
+                print bill
+                bill.Extra_Charges.append(Other_Charges(charge_Description=description,
+                                    charge_Value=Charges,doctor_Id=str(username)))
+                bill.save()
     return render(request,"AdmittedPatients.html",{'patients':patientsList})
+
+def view_MonthlyEarnings(request,username):
+    date = datetime.now()
+    consultation_earnings = 0
+    in_Admissions_earnings = 0
+    doc = Doctor.objects(username=username).first()
+    fees = doc.consulting_fees
+    appointments = doc.doctor_appointments
+    for appointment in appointments:
+        if str(appointment.date).split('-')[1].strip() == str(date).split('-')[1].strip():
+            consultation_earnings = consultation_earnings + fees
+
+    if doc.patients_discharged is not None:
+        patients= doc.patients_discharged
+        for patient in patients:
+            prev_recs=prev_rec.objects(patient_Id=patient)
+            for bill in prev_recs:
+                if bill.date.split('-')[1].strip() == date.split('-')[1].strip():
+                    for charge in bill.Extra_Charges:
+                        while charge.doctor_Id != None:
+                            in_Admissions_earnings =in_Admissions_earnings+bill.Extra_Charges.charge_Value
+
+
+    final_earnings = 0.7 * (consultation_earnings +  in_Admissions_earnings)
+    return render(request,"View_Earnings.html",{'final_earnings':final_earnings})

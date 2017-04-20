@@ -16,6 +16,8 @@
 
 {% block side_options_messages %}
     <form method="post">
+    {% csrf_token %}
+
 <table class="table">
   <thead>
     <tr>
@@ -24,14 +26,17 @@
       <th>Description</th>
       <th>Charges</th>
     </tr>
+
   </thead>
 <tbody>
 {% for x in patients %}
     <tr>
       <th scope="row">{{ forloop.counter }}</th>
-      <td>{{ x.first_name }} {{ x.last_name }}</td>
-      <td><input type="text" id="Description" name="Description"/> </td>
-      <td><input type="text" id="Charges" name="Charges"/> </td>
+      <td><input type="hidden" class="form-control" id ="patient{{ forloop.counter }}"
+                 name="patient{{ forloop.counter }}" value="{{ x.patientId }}"/>{{ x.first_name }} {{ x.last_name }}</td>
+      <td><input type="text" class="form-control"  id="Description{{ forloop.counter }}"
+                 name="Description{{ forloop.counter }}" value="Surgery" onchange="Assign();"/></td>
+        <td><input type="text" id="Charges{{ forloop.counter }}" class="form-control"  name="Charges{{ forloop.counter }}" value="0.0"/> </td>
     </tr>
 {% endfor %}
     </tbody>
@@ -39,4 +44,8 @@
     <input type="submit"  class="btn btn-success" name="Add"  id="Add"
            value="Add"/>
     </form>
+
+    <script type="application/javascript">
+
+    </script>
 {% endblock %}

@@ -64,6 +64,7 @@ class Doctor(Stakeholders):
     office_hours = ListField(EmbeddedDocumentField(Timings))
     doctor_appointments = ListField(EmbeddedDocumentField(DoctorAppointments))
     patients_admitted= ListField(StringField())
+    patients_discharged = ListField(StringField())
     transfer_request = ListField(EmbeddedDocumentField(TransferRequests))
 
 class Receptionist(Stakeholders):
@@ -77,6 +78,7 @@ class Beds(Document):
     patient_name = StringField(default=None)
 
 class Other_Charges(EmbeddedDocument):
+    doctor_Id = StringField(default=None)
     charge_Description = StringField(required=True)
     charge_Value = FloatField(required=True)
 
@@ -85,7 +87,23 @@ class Bill(Document):
     doctor_Id = StringField(required=True)
     doctor_Fees = FloatField(required=True)
     Extra_Charges=ListField(EmbeddedDocumentField(Other_Charges))
+    dateOfDischarge=StringField(default="")
+    dateOfAdmission=StringField(required=True)
+    paid = BooleanField(default=False)
 
+
+class Bills(EmbeddedDocument):
+    patient_Id = StringField(required=True,primary_key=True)
+    doctor_Id = StringField(required=True)
+    doctor_Fees = FloatField(required=True)
+    Extra_Charges=ListField(EmbeddedDocumentField(Other_Charges))
+    dischargeDate=StringField(default="")
+    admitDate=StringField(required=True)
+    total=FloatField()
+
+class prev_rec(Document):
+    patient_Id = StringField(required=True, primary_key=True)
+    records=ListField(EmbeddedDocumentField(Bills))
 
 class Test(Document):
     id = IntField(primary_key=True)
