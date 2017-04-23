@@ -129,7 +129,7 @@ def generate_bill(request, username):
             if (prev_rec.objects(patient_Id=patientID).first() == None):
                 prev_rec.objects.create(patient_Id=patientID)
             patient = Patient.objects(username=patientID).only('first_name', 'last_name', 'email', 'address').first()
-            charge = float(tcharge);
+            charge = float(tcharge)
             for bill in Bill.objects:
                 if (bill.patient_Id == patientID):
                     charge=charge+bill.doctor_Fees
@@ -174,12 +174,13 @@ def generate_bill(request, username):
             Beds.objects(room_type=room_t, room_number=room_no, bed_number=bed_no, location=loc). \
                 update_one(set__patient_name=None)
 
+
             if (prev_rec.objects(patient_Id=patientID).first() == None):
                 prev_rec.objects.create(patient_Id=patientID)
             patient = Patient.objects(username=patientID).only('first_name', 'last_name', 'email', 'address').first()
-            charge = float(tcharge);
+            charge = float(tcharge)
             for bill in Bill.objects:
-                if (bill.patient_Id == patientID):
+                if bill.patient_Id == patientID:
                     for x in bill.Extra_Charges:
                         charge = charge + float(x.charge_Value)
                     #if (float(tcharge) > float(0)):
@@ -913,7 +914,15 @@ def test_page(request):
     
     return HttpResponse("hi")
     '''
-    return render(request, "transferpatient.html", {"name": "Mithun", "location": "NC"})
+    d = Doctor.objects(username="rcoleman1g").first()
+    print d.patients_discharged
+
+    d.patients_discharged.append("rstone1")
+
+    print d.patients_discharged
+    d.save()
+
+    return HttpResponse("Hi")
 
 @never_cache
 @login_required
@@ -929,19 +938,16 @@ def transferpatient(request, receptionist_username, patient_username):
                 error = "Patient transfer request already initiated"
             else:
                 if doctor:
-                    if doctor.state != patient.state:
-                        try:
-                            doctor.transfer_request.append(TransferRequests(patient_id=patient_username,
-                                                                            patient_name="{} {}".format(
-                                                                                patient.first_name, patient.last_name),
-                                                                            location=patient.state,
-                                                                            description=description))
-                            doctor.save()
-                            return render(request, "ptransfers.html")
-                        except:
-                            error = "Something went wrong. Try again!"
-                    else:
-                        error = "No need for approvals in internal transfer."
+                    try:
+                        doctor.transfer_request.append(TransferRequests(patient_id=patient_username,
+                                                                        patient_name="{} {}".format(
+                                                                            patient.first_name, patient.last_name),
+                                                                        location=patient.state,
+                                                                        description=description))
+                        doctor.save()
+                        return render(request, "ptransfers.html")
+                    except:
+                        error = "Something went wrong. Try again!"
                 else:
                     error = "Doctor ID is not valid."
         return render(request, "transferpatient.html", {"name": "{} {}".format(patient.first_name, patient.last_name),
@@ -977,14 +983,34 @@ def view_transfer_consents(request, doctor_username):
 def approve_transfer_consent(request, doctor_id, patient_id):
     doctor = Doctor.objects(username=doctor_id).only("state").first()
     if doctor:
+        charge = 0.0
+        if prev_rec.objects(patient_Id=patient_id).first() is None:
+            prev_rec.objects.create(patient_Id=patient_id)
+        for bill in Bill.objects(patient_Id=patient_id):
+            charge = charge + float(bill.doctor_Fees)
+            for x in bill.Extra_Charges:
+                charge = charge + float(x.charge_Value)
+            dateOfDischarge = str(time.strftime("%c"))
+            newbill = prev_rec.objects(patient_Id=patient_id).first()
+            newbill.records.append(Bills(patient_Id=bill.patient_Id, doctor_Id=bill.doctor_Id,
+                                         doctor_Fees=bill.doctor_Fees,
+                                         dateOfDischarge=dateOfDischarge, dateOfAdmission=bill.dateOfAdmission))
+            newbill.save()
+        prev_doctor = Patient.objects(username=patient_id).only("doctor_name").first()
+        prev_doctor_id = prev_doctor.doctor_name
+        Patient.objects(username=patient_id).update_one(set__doctor_name=doctor_id)
+        Beds.objects(patient_name=patient_id). \
+            update_one(set__patient_name=None)
+
         Beds.objects(room_type="Transfer", location=doctor.state). \
             update_one(set__patient_name=patient_id)
-        Patient.objects(username=patient_id).update(set__doctor_name=doctor_id)
         Doctor.objects(username=doctor_id).update(push__patients_admitted=patient_id)
         Doctor.objects.filter(transfer_request__patient_id=patient_id).update(
             pull__transfer_request__patient_id=patient_id)
-        Beds.objects(patient_name=patient_id). \
-            update_one(set__patient_name=None)
+        d = Doctor.objects(username=prev_doctor_id).first()
+        d.patients_admitted.remove(str(patient_id).strip())
+        d.patients_discharged.append(str(patient_id).strip())
+        d.save()
         return render(request, "transferaccept.html")
     else:
         return redirect(login_page)
@@ -1039,30 +1065,24 @@ class patient():
     first_name = StringField()
     last_name=StringField()
 
-def view_Patients(request,username):
+def view_Patients(request, username):
     patientsList = []
-    patients = Doctor.objects(username=username).first()
-    for i in range(0, len(patients.patients_admitted)):
-        name = Patient.objects(username=patients.patients_admitted[i]). \
-            only('first_name', 'last_name').first()
-        p = patient()
-        p.first_name = name.first_name
-        p.last_name = name.last_name
-        p.patientId = patients.patients_admitted[i]
-        patientsList.append(p)
+    doctor = Doctor.objects(username=username).first()
+    for i in range(0, len(doctor.patients_admitted)):
+        patient_obj = Patient.objects(username=doctor.patients_admitted[i]).only('first_name', 'last_name').first()
+        patientsList.append("{} {}".format(patient_obj.first_name, patient_obj.last_name))
     if request.POST:
-        doc = Doctor.objects(username=username).first()
-        for i in range(1, len(patients.patients_admitted)+1):
+        for i in range(1, len(doctor.patients_admitted)+1):
             description = str(request.POST.get("Description"+str(i)))
             Charges = str(request.POST.get("Charges"+str(i))).strip()
             patientID = str(request.POST.get("patient"+str(i))).strip()
             if(float(Charges)>0.0):
                 bill = Bill.objects(patient_Id=patientID).first()
-                print bill
                 bill.Extra_Charges.append(Other_Charges(charge_Description=description,
                                     charge_Value=Charges,doctor_Id=str(username)))
                 bill.save()
-    return render(request,"AdmittedPatients.html",{'patients':patientsList})
+    print patientsList
+    return render(request,"AdmittedPatients.html", {'patients': patientsList})
 
 def view_MonthlyEarnings(request,username):
     date = datetime.now()

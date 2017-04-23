@@ -33,7 +33,7 @@
     <tr>
       <th scope="row">{{ forloop.counter }}</th>
       <td><input type="hidden" class="form-control" id ="patient{{ forloop.counter }}"
-                 name="patient{{ forloop.counter }}" value="{{ x.patientId }}"/>{{ x.first_name }} {{ x.last_name }}</td>
+                 name="patient{{ forloop.counter }}" value="{{ x.patientId }}"/>{{ x }}</td>
       <td><input type="text" class="form-control"  id="Description{{ forloop.counter }}"
                  name="Description{{ forloop.counter }}" value="Surgery" onchange="Assign();"/></td>
         <td><input type="text" id="Charges{{ forloop.counter }}" class="form-control"  name="Charges{{ forloop.counter }}" value="0.0"/> </td>

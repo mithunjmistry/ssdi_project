@@ -91,7 +91,7 @@ class Doctor(Stakeholders):
     consulting_fees = FloatField(default=50.0)
     office_hours = ListField(EmbeddedDocumentField(Timings))
     doctor_appointments = ListField(EmbeddedDocumentField(DoctorAppointments))
-    patients_admitted= ListField(StringField())
+    patients_admitted = ListField(StringField())
     patients_discharged = ListField(StringField())
     transfer_request = ListField(EmbeddedDocumentField(TransferRequests))
 
