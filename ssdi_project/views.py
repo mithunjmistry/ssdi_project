@@ -135,17 +135,32 @@ def generate_bill(request, username):
                     charge=charge+bill.doctor_Fees
                     for x in bill.Extra_Charges:
                         charge = charge + float(x.charge_Value)
-                    if (float(tcharge) > float(0)):
-                        bill.Extra_Charges.append(
+                    #if (float(tcharge) > float(0)):
+                    bill.Extra_Charges.append(
                             Other_Charges(charge_Description=str(cdesc), charge_Value=float(tcharge), doctor=0))
                         #bill.date = str(time.strftime("%c"))
-                        bill.save()
-                        return render(request, "generateBill.html",
+                    bill.save()
+                    return render(request, "generateBill.html",
                               {"charges": charge, "content": bill, "date": str(time.strftime("%c")),
                                "name": str(patient.first_name) + " " + str(patient.last_name),
                                "email": str(patient.email), "address": str(patient.address), "user": username,
                                "patient": str(patientID)})
         if 'Generate_Bill' in request.POST:
+            patientID = str(request.POST.get("patientID")).strip()
+            doctorName = str(request.POST.get("doctorName"))
+            for b in Beds.objects():
+                if (b.patient_name == patientID):
+                    room_t = str(b.room_type)
+                    room_no = int(b.room_number)
+                    bed_no = int(b.bed_number)
+                    loc = str(b.location)
+                    break
+            Patient.objects(username=patientID).update_one(set__currently_admitted=False)
+            Patient.objects(username=patientID).update_one(set__doctor_name=None)
+            Beds.objects(room_type=room_t, room_number=room_no, bed_number=bed_no, location=loc). \
+                update_one(set__patient_name=None)
+
+
             tcharge = request.POST.get('tcharges2')
             print tcharge
             patientID = request.POST.get("patientID2")
@@ -160,8 +175,8 @@ def generate_bill(request, username):
                 if (bill.patient_Id == patientID):
                     for x in bill.Extra_Charges:
                         charge = charge + float(x.charge_Value)
-                    if (float(tcharge) > float(0)):
-                        bill.Extra_Charges.append(
+                    #if (float(tcharge) > float(0)):
+                    bill.Extra_Charges.append(
                             Other_Charges(charge_Description=str(cdesc), charge_Value=float(tcharge), doctor=0))
                     bill.dateOfDischarge = str(time.strftime("%c"))
                     bill.save()
@@ -185,18 +200,6 @@ def discharge_patient(request, username):
         if request.POST.get("patientID") != None:
             patientID = str(request.POST.get("patientID")).strip()
             doctorName = str(request.POST.get("doctorName"))
-            for b in Beds.objects():
-                if (b.patient_name == patientID):
-                    room_t = str(b.room_type)
-                    room_no = int(b.room_number)
-                    bed_no = int(b.bed_number)
-                    loc = str(b.location)
-                    break
-            Patient.objects(username=patientID).update_one(set__currently_admitted=False)
-            Patient.objects(username=patientID).update_one(set__doctor_name=None)
-            Doctor.objects(username=patientID).update_one(pull__patients_admitted='')
-            Beds.objects(room_type=room_t, room_number=room_no, bed_number=bed_no, location=loc). \
-                update_one(set__patient_name=None)
 
             patient = Patient.objects(username=patientID).only('first_name', 'last_name', 'email', 'address').first()
             charge = 0.0;
