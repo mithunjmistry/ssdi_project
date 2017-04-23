@@ -125,8 +125,8 @@ class Bills(EmbeddedDocument):
     doctor_Id = StringField(required=True)
     doctor_Fees = FloatField(required=True)
     Extra_Charges=ListField(EmbeddedDocumentField(Other_Charges))
-    dischargeDate=StringField(default="")
-    admitDate=StringField(required=True)
+    dateOfDischarge=StringField(default="")
+    dateOfAdmission=StringField(required=True)
     total=FloatField()
 
 class prev_rec(Document):

@@ -146,8 +146,22 @@ def generate_bill(request, username):
                                "email": str(patient.email), "address": str(patient.address), "user": username,
                                "patient": str(patientID)})
         if 'Generate_Bill' in request.POST:
-            patientID = str(request.POST.get("patientID")).strip()
+            tcharge = request.POST.get('tcharges2')
+            print tcharge
+            patientID = request.POST.get("patientID2")
+            print patientID
+            cdesc = request.POST.get("description12")
+            print request.POST
             doctorName = str(request.POST.get("doctorName"))
+            print doctorName
+
+            d = Doctor.objects(username=doctorName.strip()).first()
+            print d
+            print doctorName
+            d.patients_admitted.remove(patientID.strip())
+            d.patients_discharged.append(patientID)
+            d.save()
+                    #return HttpResponse("Removed by backend.")
             for b in Beds.objects():
                 if (b.patient_name == patientID):
                     room_t = str(b.room_type)
@@ -159,19 +173,7 @@ def generate_bill(request, username):
             Patient.objects(username=patientID).update_one(set__doctor_name=None)
             Beds.objects(room_type=room_t, room_number=room_no, bed_number=bed_no, location=loc). \
                 update_one(set__patient_name=None)
-            d = Doctor.objects(username=doctorName.strip()).first()
-            d.patients_admitted.remove(patientID.strip())
-            d.patients_discharged.append(patientID)
-            d.save()
-                    #return HttpResponse("Removed by backend.")
 
-
-            tcharge = request.POST.get('tcharges2')
-            print tcharge
-            patientID = request.POST.get("patientID2")
-            print patientID
-            cdesc = request.POST.get("description12")
-            print request.POST
             if (prev_rec.objects(patient_Id=patientID).first() == None):
                 prev_rec.objects.create(patient_Id=patientID)
             patient = Patient.objects(username=patientID).only('first_name', 'last_name', 'email', 'address').first()
@@ -217,16 +219,17 @@ def discharge_patient(request, username):
                                   {"charges": charge, "content": bill, "date": str(time.strftime("%c")),
                                    "name": str(patient.first_name) + " " + str(patient.last_name),
                                    "email": str(patient.email), "address": str(patient.address), "user": username,
-                                   "patient": str(patientID)})
+                                   "patient": str(patientID),"docName":doctorName})
                     # return HttpResponse("Removed by backend.")
     else:
         return redirect(login_page)
     full_name = []
     doctor_name = []
     patient_id = []
-    for patient in Patient.objects(state=t.state).only('first_name', 'last_name', 'doctor_name', 'username',
-                                                       'currently_admitted'):
-        if (patient.currently_admitted):
+    ####################################################################################################################
+    for bed in Beds.objects(location=t.state):
+        if bed.patient_name:
+            patient=Patient.objects(username=str(bed.patient_name)).only('first_name', 'last_name', 'doctor_name', 'username','currently_admitted').first()
             full_name.append(str(patient.first_name + " " + patient.last_name))
             doctor_name.append(str(patient.doctor_name))
             patient_id.append(str(patient.username))
@@ -796,10 +799,14 @@ def test_database(request):
 
 
 def backend_adder(request):
-    b2 = Beds.objects.create(room_type="AC Deluxe", room_number=1, bed_number=1,location="NY")
+    beds=Beds.objects()
+    for b in beds:
+        b.patient_name=None
+        b.save()
+    """b2 = Beds.objects.create(room_type="AC Deluxe", room_number=1, bed_number=1,location="NY")
     b2.save()
     b2 = Beds.objects.create(room_type="AC Deluxe", room_number=2, bed_number=2,location="NY")
-    b2.save()
+    b2.save()"""
     return HttpResponse("This is nice")
 
 
@@ -978,12 +985,12 @@ def view_MonthlyEarnings(request,username):
     if doc.patients_discharged is not None:
         patients= doc.patients_discharged
         for patient in patients:
-            prev_recs=prev_rec.objects(patient_Id=patient)
-            for bill in prev_recs:
-                if bill.date.split('-')[1].strip() == date.split('-')[1].strip():
+            prev_recs=prev_rec.objects(patient_Id=patient).first()
+            for bill in prev_recs.records:
+                if bill.dateOfDischarge.split('/')[0].strip() == str(date).split('-')[1].strip():
                     for charge in bill.Extra_Charges:
-                        while charge.doctor_Id != None:
-                            in_Admissions_earnings =in_Admissions_earnings+bill.Extra_Charges.charge_Value
+                        if charge.doctor_Id != None:
+                            in_Admissions_earnings =in_Admissions_earnings+charge.charge_Value
 
 
     final_earnings = 0.7 * (consultation_earnings +  in_Admissions_earnings)
