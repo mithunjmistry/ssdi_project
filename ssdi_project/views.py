@@ -209,7 +209,7 @@ def discharge_patient(request, username):
             doctorName = str(request.POST.get("doctorName"))
 
             patient = Patient.objects(username=patientID).only('first_name', 'last_name', 'email', 'address').first()
-            charge = 0.0;
+            charge = 0.0
             for bill in Bill.objects:
                 if (bill.patient_Id == patientID):
                     charge = charge + float(bill.doctor_Fees)
