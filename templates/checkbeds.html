@@ -17,15 +17,17 @@
     <tr>
       <th>#</th>
       <th>Room Type</th>
-      <th>Available beds</th>
+      <th>room_number</th>
+      <th>bed_number</th>
     </tr>
   </thead>
 <tbody>
-{% for key,value in d.items %}
+{% for x in d %}
     <tr>
       <th scope="row">{{ forloop.counter }}</th>
-      <td>{{ key }}</td>
-      <td>{{ value }}</td>
+      <td>{{ x.room_type }}</td>
+      <td>{{ x.room_number }}</td>
+      <td>{{ x.bed_number }}</td>
     </tr>
 {% endfor %}
     </tbody>
