@@ -33,6 +33,7 @@
       <th class="col-md-5 col-xs-5">ID</th>
       <th class="col-md-5 col-xs-5">Doctor</th>
       <th class="col-md-5 col-xs-5">Discharge</th>
+        <th class="col-md-5 col-xs-5">Transfer</th>
     </tr>
   </thead>
   <tbody>
@@ -40,7 +41,7 @@
       <td>{{ full_name }}</td>
       <td>{{ patient_id }}</td>
       <td>{{ doctor_name }}</td>
-      <td><a style="color: black" id=row{{forloop.counter}}>{{ "Discharge" }}</a></td>
+      <td><a style="color: black" id=row{{forloop.counter}} class="btn btn-default">Discharge</a></td>
       <td><a href="/transfer/{{ user.get_username }}/{{ patient_id }}" class="btn btn-default">Transfer</a></td>
     </tr>
   {% endfor %}
