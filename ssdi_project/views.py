@@ -698,30 +698,123 @@ def view_time(request, username):
     date_refined = list(items)
     content = zip(k, l, time, date_refined, day)
     if request.POST:
+        print "Came in post"
+        today_day_time = datetime.now()
         got_time = str(request.POST.get("slot")).strip()
         if 'Monday' in request.POST:
             dts = date_refined[0]
-            request.session["name"] = full_name
-            request.session["date"] = dts
-            request.session["time"] = got_time
-            request.session["state"] = state
-            request.session["username"] = username
-            return redirect(book_appointment, username)
+            if today_day_time.strftime("%A").lower() == "monday":
+                if int(today_day_time.hour) > int(got_time[:2]) and int(today_day_time.minute) > int(got_time[4:]):
+                    error = "You cannot book in previous time"
+                else:
+                    request.session["name"] = full_name
+                    request.session["date"] = dts
+                    request.session["time"] = got_time
+                    request.session["state"] = state
+                    request.session["username"] = username
+                    return redirect(book_appointment, username)
+            else:
+                request.session["name"] = full_name
+                request.session["date"] = dts
+                request.session["time"] = got_time
+                request.session["state"] = state
+                request.session["username"] = username
+                return redirect(book_appointment, username)
         elif 'Tuesday' in request.POST:
             dts = date_refined[1]
-            return redirect(book_appointment, username, full_name, dts, got_time, state)
+            if today_day_time.strftime("%A").lower() == "tuesday":
+                if int(today_day_time.hour) > int(got_time[:2]) and int(today_day_time.minute) > int(got_time[4:]):
+                    error = "You cannot book in previous time"
+                else:
+                    request.session["name"] = full_name
+                    request.session["date"] = dts
+                    request.session["time"] = got_time
+                    request.session["state"] = state
+                    request.session["username"] = username
+                    return redirect(book_appointment, username)
+            else:
+                request.session["name"] = full_name
+                request.session["date"] = dts
+                request.session["time"] = got_time
+                request.session["state"] = state
+                request.session["username"] = username
+                return redirect(book_appointment, username)
         elif 'Wednesday' in request.POST:
             dts = date_refined[2]
-            return redirect(book_appointment, username, full_name, dts, got_time, state)
+            if today_day_time.strftime("%A").lower() == "wednesday":
+                if int(today_day_time.hour) > int(got_time[:2]) and int(today_day_time.minute) > int(got_time[4:]):
+                    error = "You cannot book in previous time"
+                else:
+                    request.session["name"] = full_name
+                    request.session["date"] = dts
+                    request.session["time"] = got_time
+                    request.session["state"] = state
+                    request.session["username"] = username
+                    return redirect(book_appointment, username)
+            else:
+                request.session["name"] = full_name
+                request.session["date"] = dts
+                request.session["time"] = got_time
+                request.session["state"] = state
+                request.session["username"] = username
+                return redirect(book_appointment, username)
         elif 'Thursday' in request.POST:
             dts = date_refined[3]
-            return redirect(book_appointment, username, full_name, dts, got_time, state)
+            if today_day_time.strftime("%A").lower() == "thursday":
+                if int(today_day_time.hour) > int(got_time[:2]) and int(today_day_time.minute) > int(got_time[4:]):
+                    error = "You cannot book in previous time"
+                else:
+                    request.session["name"] = full_name
+                    request.session["date"] = dts
+                    request.session["time"] = got_time
+                    request.session["state"] = state
+                    request.session["username"] = username
+                    return redirect(book_appointment, username)
+            else:
+                request.session["name"] = full_name
+                request.session["date"] = dts
+                request.session["time"] = got_time
+                request.session["state"] = state
+                request.session["username"] = username
+                return redirect(book_appointment, username)
         elif 'Friday' in request.POST:
             dts = date_refined[4]
-            return redirect(book_appointment, username, full_name, dts, got_time, state)
+            if today_day_time.strftime("%A").lower() == "friday":
+                if int(today_day_time.hour) > int(got_time[:2]) and int(today_day_time.minute) > int(got_time[4:]):
+                    error = "You cannot book in previous time"
+                else:
+                    request.session["name"] = full_name
+                    request.session["date"] = dts
+                    request.session["time"] = got_time
+                    request.session["state"] = state
+                    request.session["username"] = username
+                    return redirect(book_appointment, username)
+            else:
+                request.session["name"] = full_name
+                request.session["date"] = dts
+                request.session["time"] = got_time
+                request.session["state"] = state
+                request.session["username"] = username
+                return redirect(book_appointment, username)
         elif 'Saturday' in request.POST:
             dts = date_refined[5]
-            return redirect(book_appointment, username, full_name, dts, got_time, state)
+            if today_day_time.strftime("%A").lower() == "saturday":
+                if int(today_day_time.hour) > int(got_time[:2]) and int(today_day_time.minute) > int(got_time[4:]):
+                    error = "You cannot book in previous time"
+                else:
+                    request.session["name"] = full_name
+                    request.session["date"] = dts
+                    request.session["time"] = got_time
+                    request.session["state"] = state
+                    request.session["username"] = username
+                    return redirect(book_appointment, username)
+            else:
+                request.session["name"] = full_name
+                request.session["date"] = dts
+                request.session["time"] = got_time
+                request.session["state"] = state
+                request.session["username"] = username
+                return redirect(book_appointment, username)
         else:
             error = "You cannot book appointment on Sunday"
     return render(request, "view_timings.html", {"content": content, "name": full_name, "speciality": speciality,
