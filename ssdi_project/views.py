@@ -832,7 +832,7 @@ def transferpatient(request, receptionist_username, patient_username):
             doctorID = request.POST.get("doctorID").strip()
             description = request.POST.get("description").strip()
             doctor = Doctor.objects(username=doctorID).first()
-            if Doctor.objects.filter(transfer_request__patient_id="mscottv"):
+            if Doctor.objects.filter(transfer_request__patient_id=patient_username):
                 error = "Patient transfer request already initiated"
             else:
                 if doctor:
