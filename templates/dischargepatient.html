@@ -108,7 +108,7 @@ $(document).ready(function() {
 
 $(document).ready(function() {
         $('#Admit').on("click",function() {
-        alert("========================DISCHARGE=========================")
+
     });
 });
 
@@ -116,9 +116,6 @@ $(document).ready(function() {
 
 {% for full_name,doctor_name in content %}
       $('#row{{ forloop.counter }}').on("click",function() {
-        alert($(this).closest('tr').text().toString())
-        alert($(this).closest('tr').text().toString().split("\n")[1])
-        alert($(this).closest('tr').text().toString().split("\n")[2])
         $('#patientID').val($(this).closest('tr').text().toString().split("\n")[1])
         $('#doctorName').val($(this).closest('tr').text().toString().split("\n")[2])
         if (($('#patientID').val!='') && ($('#doctorName').val!='')){

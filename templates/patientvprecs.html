@@ -9,6 +9,7 @@
 <li><a style="background-color:#a7adba;" href="/viewappointments/patient/{{ user.get_username }}">View my Appointments</a></li>
 <li><a style="background-color:#a7adba;" href="#tab_c" data-toggle="pill">My Prescriptions</a></li>
 <li><a style="background-color:#a7adba;" href="/viewbills/patient/{{ user.get_username }}">Previous Bills</a></li>
+    <li><a style="background-color:#a7adba;" href="/settlebill/patient/{{ user.get_username }}">Settle Bill</a></li>
 {% endblock %}
 
 {% block message %}<p> {{ message }} </p>
@@ -108,12 +109,13 @@
                     <table>
                         <tr>
                             <td class="title">
-                                <img src="logo.png" style="width:100%; max-width:300px;" />
+                                {% load static %}
+                                <img src="{% static "img/logo.png" %}" style="width:100%; max-width:300px;" />
                             </td>
 
                             <td >
-                                Admitted: {{ x.adate }}<br>
-                                Discharged: {{ x.date }}<br>
+                                Admitted: {{ x.dateOfAdmission }}<br>
+                                Discharged: {{ x.dateOfDischarge }}<br>
                             </td>
                         </tr>
                     </table>
