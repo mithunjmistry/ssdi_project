@@ -187,11 +187,29 @@ class MyTestCase(unittest.TestCase):
         self.assertIsNotNone(requests.post(url, params={}, headers=None))
 
     def test_approve_transfer_consent(self):
+        from django.http import HttpRequest
+        from views import approve_transfer_consent
+        testrequest = HttpRequest()
+        testuser = User()
+        testuser.username = 'dcole0'
+        testuser.password = '123456789'
+        testuser.is_active = True
+        testrequest.user = testuser
+        self.assertIsNotNone(approve_transfer_consent(testrequest, testrequest.user.username, "sscott0"))
         import requests
         url = 'http://127.0.0.1:8000/transferapprove/dcole0/sscott0'
         self.assertIsNotNone(requests.post(url, params={}, headers=None))
 
     def test_reject_transfer_consent(self):
+        from django.http import HttpRequest
+        from views import reject_transfer_consent
+        testrequest = HttpRequest()
+        testuser = User()
+        testuser.username = 'dcole0'
+        testuser.password = '1234567890'
+        testuser.is_active = True
+        testrequest.user = testuser
+        self.assertIsNotNone(reject_transfer_consent(testrequest, testrequest.user.username, "sscott0"))
         import requests
         url = 'http://127.0.0.1:8000/transferreject/dcole0/sscott0'
         self.assertIsNotNone(requests.post(url, params={}, headers=None))
