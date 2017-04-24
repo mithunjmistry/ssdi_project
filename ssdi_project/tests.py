@@ -163,15 +163,38 @@ class MyTestCase(unittest.TestCase):
 
     def test_option_maker(self):
         from views import option_maker
-        retVal = option_maker('holiday')
+        retVal = option_maker('holiday', "dcole0", "Sunday")
         for i in retVal:
             print i
         self.assertIsNotNone(retVal)
+
 
     def test_get_clean_timings_array(self):
         from views import get_clean_timings_array
         retVal = get_clean_timings_array('holiday')
         self.assertIsNotNone(retVal)
+
+    def test_transfer_patient(self):
+        import requests
+        import json
+        url = 'http://127.0.0.1:8000/transfer/rachel/sscott0'
+        data = {"data": {"doctorID": 'dcole0', "description": 'Needs eye surgery'}}
+        self.assertIsNotNone(requests.post(url, params={}, data=json.dumps(data), headers=None))
+
+    def test_view_transfer_consents(self):
+        import requests
+        url = 'http://127.0.0.1:8000/tconsent/dcole0'
+        self.assertIsNotNone(requests.post(url, params={}, headers=None))
+
+    def test_approve_transfer_consent(self):
+        import requests
+        url = 'http://127.0.0.1:8000/transferapprove/dcole0/sscott0'
+        self.assertIsNotNone(requests.post(url, params={}, headers=None))
+
+    def test_reject_transfer_consent(self):
+        import requests
+        url = 'http://127.0.0.1:8000/transferreject/dcole0/sscott0'
+        self.assertIsNotNone(requests.post(url, params={}, headers=None))
 
 if __name__ == '__main__':
     unittest.main()
