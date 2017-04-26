@@ -21,7 +21,7 @@ class Appointments(EmbeddedDocument):
 class Other_Charges(EmbeddedDocument):
     charge_Description = StringField(required=True)
     charge_Value = FloatField(required=True)
-    doctor=BooleanField(default=False)
+    doctor_Id=StringField(default=None)
 
 class Bill(Document):
     patient_Id = StringField(required=True,primary_key=True)

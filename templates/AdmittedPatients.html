@@ -34,8 +34,8 @@
 {% for x in patients %}
     <tr>
       <th scope="row">{{ forloop.counter }}</th>
-      <td><input type="hidden" class="form-control" id ="patient{{ forloop.counter }}"
-                 name="patient{{ forloop.counter }}" value="{{ x.patientId }}"/>{{ x }}</td>
+      <td><input type="hidden" class="form-control" id ="patientname{{ forloop.counter }}"
+                 name="patientname{{ forloop.counter }}" value="{{ x.patientId }}"/>{{ x }}</td>
       <td><input type="text" class="form-control"  id="Description{{ forloop.counter }}"
                  name="Description{{ forloop.counter }}" value="Surgery" onchange="Assign();"/></td>
         <td><input type="text" id="Charges{{ forloop.counter }}" class="form-control"  name="Charges{{ forloop.counter }}" value="0.0"/> </td>
@@ -43,6 +43,12 @@
 {% endfor %}
     </tbody>
 </table>
+
+    {% for x in patientIDs %}
+    <input type="hidden" class="form-control" id ="patient{{ forloop.counter }}"
+                 name="patient{{ forloop.counter }}" value="{{ x }}"/>
+    {% endfor %}
+
     <input type="submit"  class="btn btn-success" name="Add"  id="Add"
            value="Add"/>
     </form>
